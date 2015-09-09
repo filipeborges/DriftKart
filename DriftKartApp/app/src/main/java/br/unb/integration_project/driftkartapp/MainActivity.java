@@ -1,9 +1,11 @@
-package com.jabarasca.driftkartapp;
+package br.unb.integration_project.driftkartapp;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.jabarasca.driftkartapp.R;
 
 public class MainActivity extends AppCompatActivity {
 

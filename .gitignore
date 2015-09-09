@@ -3,5 +3,7 @@ DriftKartApp/local.properties
 DriftKartApp/.idea/workspace.xml
 DriftKartApp/.idea/libraries
 DriftKartApp/.DS_Store
-DriftKartApp/build
+DriftKartApp/build/
+DriftKartApp/app/build
 DriftKartApp/captures
+*.iml

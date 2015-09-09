@@ -1,4 +1,4 @@
-package com.jabarasca.driftkartapp;
+package br.unb.integration_project.driftkartapp;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
