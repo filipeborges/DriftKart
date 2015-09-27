@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/performance_RelLay"
+    android:layout_width="125dp"
+    android:layout_height="125dp"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentRight="true">
+
+    <!--TODO: Needs to move styles items to styles.xml. -->
+    <!--TODO: Needs to move strings to strings.xml -->
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/performanceTextView"
+        android:paddingBottom="15dp"
+        android:layout_centerInParent="true"
+        android:id="@+id/performanceCheckBox" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="10dp"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:text="Desempenho"
+        android:textStyle="italic"
+        android:id="@+id/performanceTextView" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:id="@+id/performanceImageView"
+        android:src="#349"/>
+
+</RelativeLayout>

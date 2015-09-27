@@ -9,8 +9,11 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="br.unb.integration_project.driftkartapp.MainActivity"
-            android:label="@string/title_activity_main"
             android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 

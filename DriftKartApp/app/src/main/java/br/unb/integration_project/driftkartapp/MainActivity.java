@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.layout.speed_layout, mainRelLay);
         inflater.inflate(R.layout.temp_layout, mainRelLay);
         inflater.inflate(R.layout.battery_layout, mainRelLay);
+        inflater.inflate(R.layout.economic_layout, mainRelLay);
+        inflater.inflate(R.layout.performance_layout, mainRelLay);
     }
 
     @Override
