@@ -5,4 +5,32 @@
         <!-- Customize your theme here. -->
     </style>
 
+
+    <!-- global styles -->
+    <style name="sensorLabelStyle">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+    <style name="imageViewMockStyle">
+        <item name="android:src">#349</item>
+    </style>
+
+    <style name="sensorValueDefaultStyle">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <!--speed_layout-->
+    <style name="speedometerTextViewStyle">
+        <item name="android:textSize">110sp</item>
+        <item name="android:textColor">@color/text_color</item>
+    </style>
+    <style name="speedometerUnitTextViewStyle">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">40sp</item>
+    </style>
+
 </resources>

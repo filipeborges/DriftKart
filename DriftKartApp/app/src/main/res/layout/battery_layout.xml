@@ -6,34 +6,29 @@
     android:layout_alignParentRight="true"
     android:layout_alignParentTop="true">
 
-    <!--TODO: Needs to move styles items to styles.xml. -->
-    <!--TODO: Needs to move strings to strings.xml -->
     <ImageView
         android:id="@+id/batteryImageView"
         android:layout_width="62dp"
         android:layout_height="90dp"
-        android:src="#349"/>
+        style="@style/imageViewMockStyle"/>
 
     <TextView
+        android:id="@+id/batteryTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_below="@+id/batteryImageView"
         android:paddingTop="5dp"
-        android:textColor="#000"
-        android:textSize="18sp"
-        android:text="Autonomia"
-        android:textStyle="italic"
-        android:id="@+id/batteryTextView"
-        android:layout_below="@+id/batteryImageView"/>
+        android:text="@string/battery_label"
+        style="@style/sensorLabelStyle" />
 
     <TextView
+        android:id="@+id/batteryValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginTop="25dp"
         android:text="15%"
-        android:textSize="30sp"
-        android:textColor="#000"
-        android:id="@+id/batteryValueTextView" />
+        style="@style/sensorValueDefaultStyle" />
 
 </RelativeLayout>

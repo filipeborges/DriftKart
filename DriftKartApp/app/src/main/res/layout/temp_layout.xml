@@ -1,37 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tempRelLay"
-    android:layout_width="125dp" android:layout_height="125dp"
+    android:layout_width="125dp"
+    android:layout_height="125dp"
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true">
 
-    <!--TODO: Needs to move styles items to styles.xml. -->
-    <!--TODO: Needs to move strings to strings.xml -->
     <ImageView
         android:id="@+id/tempImageView"
         android:layout_width="62dp"
         android:layout_height="90dp"
-        android:src="#349"/>
+        style="@style/imageViewMockStyle" />
 
     <TextView
+        android:id="@+id/tempTextView"
+        android:layout_below="@+id/tempImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:paddingTop="5dp"
-        android:textColor="#000"
-        android:textSize="18sp"
-        android:text="Temperatura"
-        android:textStyle="italic"
-        android:id="@+id/tempTextView"
-        android:layout_below="@+id/tempImageView"/>
+        android:text="@string/temp_label"
+        style="@style/sensorLabelStyle" />
 
     <TextView
+        android:id="@+id/tempValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginTop="25dp"
         android:text="45 C"
-        android:textSize="30sp"
-        android:textColor="#000"
-        android:id="@+id/tempValueTextView" />
+        style="@style/sensorValueDefaultStyle" />
+
 </RelativeLayout>
