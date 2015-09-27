@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/batteryRelLay"
+    android:layout_width="125dp"
+    android:layout_height="125dp"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentTop="true">
+
+    <!--TODO: Needs to move styles items to styles.xml. -->
+    <!--TODO: Needs to move strings to strings.xml -->
+    <ImageView
+        android:id="@+id/batteryImageView"
+        android:layout_width="62dp"
+        android:layout_height="90dp"
+        android:src="#349"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="5dp"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:text="Autonomia"
+        android:textStyle="italic"
+        android:id="@+id/batteryTextView"
+        android:layout_below="@+id/batteryImageView"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="25dp"
+        android:text="15%"
+        android:textSize="30sp"
+        android:textColor="#000"
+        android:id="@+id/batteryValueTextView" />
+
+</RelativeLayout>
