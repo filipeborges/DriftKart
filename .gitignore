@@ -1,9 +1,10 @@
 DriftKartApp/.gradle
 DriftKartApp/local.properties
 DriftKartApp/.idea/workspace.xml
+DriftKartApp/.idea/dictionaries
+DriftKartApp/.idea/gradle.xml
 DriftKartApp/.idea/libraries
 DriftKartApp/.DS_Store
 DriftKartApp/build/
 DriftKartApp/app/build
 DriftKartApp/captures
-*.iml
