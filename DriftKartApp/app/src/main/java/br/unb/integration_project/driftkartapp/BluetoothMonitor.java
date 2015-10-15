@@ -2,54 +2,45 @@ package br.unb.integration_project.driftkartapp;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.widget.Toast;
 
+import java.io.IOException;
+import java.util.UUID;
+
+//The app needs to be Client and the Arduino the Server. Client will connect on Server MAC Address.
 //TODO: 1- Get BluetoohAdapter; 2- Device discovery; 3- Pair with device;
 public class BluetoothMonitor {
 
-    //TODO: This attribute needs to be passed to this Class. Actions depends from the desired behavior.
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        //CAUTION: This method will run on main thread of process.
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            switch (action) {
-                case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
-                    //If discovery started: Popup with animation.
-                    break;
-                case BluetoothDevice.ACTION_FOUND:
-                    //If device founded.
-                    //TODO: cancelDiscovey() needs to be called on ACTION_FOUND Intent.
-                    break;
-                case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
-                    //If discovery finished.
-                    break;
-            }
-        }
-    };
+    private BluetoothAdapter btAdapter;
+    private Context appContext;
 
     //getDefaultAdapter() returns null if called from emulator.
-    public BluetoothMonitor(Context pContext, BluetoothAdapter pBtAdapter,
-                            IntentFilter pFilter) {
-        if(pBtAdapter != null) {
-            if (pBtAdapter.isEnabled()) {
-                pFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-                pFilter.addAction(BluetoothDevice.ACTION_FOUND);
-                pFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+    public BluetoothMonitor(Context pContext, BluetoothAdapter pBtAdapter) {
+        btAdapter = pBtAdapter;
+        appContext = pContext;
+    }
 
-                pContext.registerReceiver(mReceiver, pFilter);
+    public void startDeviceDiscovery() {
+        //TODO: Before device discovery, query devices previous paired to see if its available.
+        //Asynchronous call.
+        btAdapter.startDiscovery();
+    }
 
-                //TODO: Handle the boolean return of method.
-                pBtAdapter.startDiscovery();
-            } else {
-                //TODO: Handle bluetooth offline case.
-            }
-        } else {
-            //TODO: Handle the case of device not having bluetooth.
-        }
+    public void cancelDeviceDiscovery() {
+        btAdapter.cancelDiscovery();
+    }
+
+    public void openSerialConnToFoundedDevice(BluetoothDevice btDevice) {
+        final String SERIAL_UUID = "00001101-0000-1000-8000-00805F9B34FB";
+        try {
+                //TODO: Implement this method.
+                BluetoothSocket btScocket = btDevice.createInsecureRfcommSocketToServiceRecord(UUID
+                        .fromString(SERIAL_UUID));
+                btScocket.connect();
+                Toast.makeText(appContext, "Conectou", Toast.LENGTH_LONG).show();
+                btScocket.close();
+        } catch(IOException ioe) {}
     }
 }

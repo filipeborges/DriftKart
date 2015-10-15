@@ -1,10 +1,10 @@
 package br.unb.integration_project.driftkartapp;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.IntentFilter;
 import junit.framework.Assert;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,24 +20,31 @@ public class TestBluetoothMonitor {
     BluetoothMonitor btMonitor;
     Context mockContext;
     BluetoothAdapter btAdapterMock;
-    IntentFilter filter;
 
     @Before
     public void setUp() {
         btAdapterMock = PowerMockito.mock(BluetoothAdapter.class);
         Mockito.when(btAdapterMock.isEnabled()).thenReturn(true);
         mockContext = Mockito.mock(Context.class);
-        filter = Mockito.mock(IntentFilter.class);
+        btMonitor = new BluetoothMonitor(mockContext, btAdapterMock);
     }
 
     @Test
-    public void constructorTestBestCase() {
-        btMonitor = new BluetoothMonitor(mockContext, btAdapterMock, filter);
-        Assert.assertNotNull(btMonitor);
+    public void testStartDiscovery() {
+        btMonitor.startDeviceDiscovery();
         Mockito.verify(btAdapterMock, Mockito.times(1)).startDiscovery();
-        Mockito.verify(filter, Mockito.times(1)).addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        Mockito.verify(filter, Mockito.times(1)).addAction(BluetoothDevice.ACTION_FOUND);
-        Mockito.verify(filter, Mockito.times(1)).addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
     }
 
+    @Test
+    public void testCancelDiscovery() {
+        btMonitor.cancelDeviceDiscovery();
+        Mockito.verify(btAdapterMock, Mockito.times(1)).cancelDiscovery();
+    }
+
+    @After
+    public void tearDown() {
+        btAdapterMock = null;
+        mockContext = null;
+        btMonitor = null;
+    }
 }
