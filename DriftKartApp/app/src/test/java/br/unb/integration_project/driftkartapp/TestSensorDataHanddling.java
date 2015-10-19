@@ -19,7 +19,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest(BluetoothAdapter.class)
 public class TestSensorDataHanddling {
 
-    SensorDataHanddling sensorDataHanddling;
+    PrepareDeviceCommunication sensorDataHanddling;
     Context mockContext;
     BluetoothAdapter btAdapterMock;
     IntentFilter filterActionMock;
@@ -30,7 +30,7 @@ public class TestSensorDataHanddling {
         PowerMockito.mockStatic(BluetoothAdapter.class);
         btAdapterMock = Mockito.mock(BluetoothAdapter.class);
         filterActionMock = Mockito.mock(IntentFilter.class);
-        sensorDataHanddling = new SensorDataHanddling(mockContext,
+        sensorDataHanddling = new PrepareDeviceCommunication(mockContext,
                 btAdapterMock, filterActionMock);
     }
 
@@ -38,15 +38,15 @@ public class TestSensorDataHanddling {
     public void testEstablishBluetoothConnection() {
         Mockito.when(btAdapterMock.isEnabled()).thenReturn(false);
         int _return = sensorDataHanddling.establishBluetoothConnection();
-        Assert.assertEquals(SensorDataHanddling.BLUETOOTH_OFFLINE, _return);
+        Assert.assertEquals(PrepareDeviceCommunication.BLUETOOTH_OFFLINE, _return);
 
         Mockito.when(btAdapterMock.isEnabled()).thenReturn(true);
         _return = sensorDataHanddling.establishBluetoothConnection();
-        Assert.assertEquals(SensorDataHanddling.BLUETOOTH_ONLINE, _return);
+        Assert.assertEquals(PrepareDeviceCommunication.BLUETOOTH_ONLINE, _return);
 
-        sensorDataHanddling = new SensorDataHanddling(mockContext, null, filterActionMock);
+        sensorDataHanddling = new PrepareDeviceCommunication(mockContext, null, filterActionMock);
         _return = sensorDataHanddling.establishBluetoothConnection();
-        Assert.assertEquals(SensorDataHanddling.NOT_HAVE_BLUETOOTH, _return);
+        Assert.assertEquals(PrepareDeviceCommunication.NOT_HAVE_BLUETOOTH, _return);
     }
 
     @Test

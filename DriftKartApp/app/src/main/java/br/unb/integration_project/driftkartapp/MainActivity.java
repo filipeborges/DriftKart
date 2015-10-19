@@ -6,12 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    BluetoothMonitor btMonitor;
-    SensorDataHanddling sensorDataHanddling;
+    PrepareDeviceCommunication prepareDeviceCommunication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,33 +24,16 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.layout.economic_layout, mainRelLay);
         inflater.inflate(R.layout.performance_layout, mainRelLay);
 
-        sensorDataHanddling = new SensorDataHanddling(this,
+        prepareDeviceCommunication = new PrepareDeviceCommunication(this,
                 BluetoothAdapter.getDefaultAdapter(), new IntentFilter());
-        validateBluetoothConnection();
-    }
-
-    public void validateBluetoothConnection() {
-        String btOfflineMessage = "Bluetooth Desligado!";
-        String notHaveBluetooth = "Não possue Bluetooth!";
-
-        int connectionStatus = sensorDataHanddling.establishBluetoothConnection();
-        switch (connectionStatus) {
-            case SensorDataHanddling.BLUETOOTH_OFFLINE:
-                Toast.makeText(getApplicationContext(), btOfflineMessage, Toast.LENGTH_LONG)
-                        .show();
-                break;
-            case SensorDataHanddling.NOT_HAVE_BLUETOOTH:
-                Toast.makeText(getApplicationContext(), notHaveBluetooth, Toast.LENGTH_LONG)
-                        .show();
-                break;
-        }
+        prepareDeviceCommunication.establishBluetoothConnection();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //TODO: Verify if BroadcastReceiver was setted.
-        unregisterReceiver(sensorDataHanddling.getBtActionReceiver());
-
+        if(prepareDeviceCommunication.isReceiverRegistered) {
+            unregisterReceiver(prepareDeviceCommunication.getBtActionReceiver());
+        }
     }
 }
