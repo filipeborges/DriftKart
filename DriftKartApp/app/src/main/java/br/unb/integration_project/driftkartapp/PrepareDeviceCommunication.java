@@ -13,7 +13,7 @@ import android.widget.Toast;
 public class PrepareDeviceCommunication {
 
     private Context appContext;
-    private BluetoothMonitor btMonitor;
+    private BluetoothConnection btMonitor;
     private AlertDialog searchDialog;
     private BluetoothDevice device;
     private IntentFilter filterAction; //Needed for unit test mock.
@@ -76,20 +76,20 @@ public class PrepareDeviceCommunication {
                                       IntentFilter pFilterAction) {
         appContext = pContext;
         filterAction = pFilterAction;
-        btMonitor = new BluetoothMonitor(appContext, pBtAdapter);
+        btMonitor = new BluetoothConnection(appContext, pBtAdapter);
     }
 
     public void establishBluetoothConnection() {
         //TODO: Handdling the case of device not discoverable, but bluetooth ON.
 
         switch (btMonitor.verifyBluetoothReady()) {
-            case BluetoothMonitor.BLUETOOTH_OFFLINE:
+            case BluetoothConnection.BLUETOOTH_OFFLINE:
                 Toast.makeText(appContext, "Bluetooth Desligado!", Toast.LENGTH_LONG).show();
                 break;
-            case BluetoothMonitor.NOT_HAVE_BLUETOOTH:
+            case BluetoothConnection.NOT_HAVE_BLUETOOTH:
                 Toast.makeText(appContext, "Nao possui Bluetooth!", Toast.LENGTH_LONG).show();
                 break;
-            case BluetoothMonitor.BLUETOOTH_ONLINE:
+            case BluetoothConnection.BLUETOOTH_ONLINE:
                 filterAction.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
                 filterAction.addAction(BluetoothDevice.ACTION_FOUND);
                 filterAction.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);

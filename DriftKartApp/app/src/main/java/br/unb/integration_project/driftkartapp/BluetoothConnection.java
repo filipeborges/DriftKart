@@ -13,7 +13,7 @@ import java.util.UUID;
 
 //The app needs to be Client and the Arduino the Server. Client will connect on Server MAC Address.
 //TODO: 1- Get BluetoothAdapter; 2- Device discovery; 3- Pair with device;
-public class BluetoothMonitor {
+public class BluetoothConnection {
 
     private BluetoothAdapter btAdapter;
     private Context appContext;
@@ -22,7 +22,7 @@ public class BluetoothMonitor {
     public static final int BLUETOOTH_ONLINE = 1;
 
     //getDefaultAdapter() returns null if called from emulator.
-    public BluetoothMonitor(Context pContext, BluetoothAdapter pBtAdapter) {
+    public BluetoothConnection(Context pContext, BluetoothAdapter pBtAdapter) {
         btAdapter = pBtAdapter;
         appContext = pContext;
     }
@@ -54,12 +54,12 @@ public class BluetoothMonitor {
         Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
 
         if(pairedDevices != null) {
-            for(BluetoothDevice btDevice : pairedDevices) {
-                if(btDevice.getAddress().equals(DEVICE_MAC_ADDRESS)) {
-                    previouslyPairedBtDevice = btDevice;
-                    break;
+                for(BluetoothDevice btDevice : pairedDevices) {
+                    if(btDevice.getAddress().equals(DEVICE_MAC_ADDRESS)) {
+                        previouslyPairedBtDevice = btDevice;
+                        break;
+                    }
                 }
-            }
             if(previouslyPairedBtDevice == null) {
                 //Creating bluetooth pairing.
                 try {
