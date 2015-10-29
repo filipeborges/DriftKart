@@ -5,21 +5,38 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.widget.Toast;
 
 //TODO: This class should be: PrepareCommunication.
+//TODO: Create a Toasty method in MainActivity, and removes all Toasty references from this class.
 public class PrepareDeviceCommunication {
 
+    public boolean isReceiverRegistered = false;
     private Context appContext;
-    private BluetoothConnection btMonitor;
+    private BluetoothConnection btConnection;
     private AlertDialog searchDialog;
     private BluetoothDevice device;
     private IntentFilter filterAction; //Needed for unit test mock.
     //TODO: Pass real MAC Address of BT Adapter on Arduino.
     private final String FAKE_KART_MAC_ADDRESS = "94:51:03:B6:45:8D";
-    public boolean isReceiverRegistered = false;
+
+    private DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int buttonValue) {
+            switch (buttonValue) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    establishBluetoothConnection();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    ((MainActivity)appContext).finish();
+                    break;
+            }
+        }
+    };
+
     private BroadcastReceiver btActionReceiver = new BroadcastReceiver() {
         //CAUTION: This method will run on main thread of process.
         @Override
@@ -35,22 +52,30 @@ public class PrepareDeviceCommunication {
             } else if(action.equals(BluetoothDevice.ACTION_FOUND)) {
                 device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if(device.getAddress().equals(FAKE_KART_MAC_ADDRESS)) {
-                    btMonitor.cancelDeviceDiscovery();
-                    btMonitor.pairWithFoundedDevice(device);
+                    btConnection.cancelDeviceDiscovery();
+                    if(btConnection.pairWithFoundedDevice(device)
+                            == BluetoothConnection.PREVIOUSLY_PAIRED) {
+                        searchDialog.dismiss();
+                        if(btConnection.openSerialConnToFoundedDevice(device) ==
+                                BluetoothConnection.SERIAL_CONN_OPENED) {
+                            Toast.makeText(appContext, "Conectou!", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(appContext, "Falha na Conexão!", Toast.LENGTH_LONG).show();
+                        }
+                    }
                 } else {
                     device = null;
                 }
 
             } else if(action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
-                searchDialog.dismiss();
                 if(device == null) {
-                    btMonitor.cancelDeviceDiscovery();
+                    btConnection.cancelDeviceDiscovery();
+                    searchDialog.dismiss();
 
                     AlertDialog.Builder btAlertBuilder = new AlertDialog.Builder(appContext);
                     btAlertBuilder.setTitle("Sem conexão com o Kart.");
-                    //TODO: Pass DialogInterface.OnClickListener to positive and negative buttons.
-                    btAlertBuilder.setPositiveButton("Tentar denovo", null);
-                    btAlertBuilder.setNegativeButton("Sair", null);
+                    btAlertBuilder.setPositiveButton("Tentar denovo", dialogListener);
+                    btAlertBuilder.setNegativeButton("Sair", dialogListener);
 
                     AlertDialog alertDialog = btAlertBuilder.create();
                     alertDialog.show();
@@ -62,8 +87,13 @@ public class PrepareDeviceCommunication {
                         .EXTRA_PREVIOUS_BOND_STATE, -1);
                 if(BOND_STATE == BluetoothDevice.BOND_BONDED) {
                     searchDialog.dismiss();
-                    //TODO: Initiating connection with Device.
                     Toast.makeText(appContext, "Pareamento: Sucesso!", Toast.LENGTH_LONG).show();
+                    if(btConnection.openSerialConnToFoundedDevice(device) ==
+                            BluetoothConnection.SERIAL_CONN_OPENED) {
+                        Toast.makeText(appContext, "Conectou!", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(appContext, "Falha na Conexão!", Toast.LENGTH_LONG).show();
+                    }
                 } else if(PREVIOUS_BOND_STATE == BluetoothDevice.BOND_BONDING
                         && BOND_STATE == BluetoothDevice.BOND_NONE) {
                     searchDialog.dismiss();
@@ -72,19 +102,20 @@ public class PrepareDeviceCommunication {
         }
     };
 
-    public PrepareDeviceCommunication(Context pContext, BluetoothAdapter pBtAdapter,
+    public PrepareDeviceCommunication(MainActivity pActivity, BluetoothAdapter pBtAdapter,
                                       IntentFilter pFilterAction) {
-        appContext = pContext;
+        appContext = pActivity;
         filterAction = pFilterAction;
-        btMonitor = new BluetoothConnection(appContext, pBtAdapter);
+        btConnection = new BluetoothConnection(appContext, pBtAdapter);
     }
 
     public void establishBluetoothConnection() {
         //TODO: Handdling the case of device not discoverable, but bluetooth ON.
 
-        switch (btMonitor.verifyBluetoothReady()) {
+        switch (btConnection.verifyBluetoothReady()) {
             case BluetoothConnection.BLUETOOTH_OFFLINE:
-                Toast.makeText(appContext, "Bluetooth Desligado!", Toast.LENGTH_LONG).show();
+                ((MainActivity)appContext).showEnableBluetoothDialog(BluetoothAdapter.
+                        ACTION_REQUEST_ENABLE);
                 break;
             case BluetoothConnection.NOT_HAVE_BLUETOOTH:
                 Toast.makeText(appContext, "Nao possui Bluetooth!", Toast.LENGTH_LONG).show();
@@ -98,7 +129,7 @@ public class PrepareDeviceCommunication {
                 isReceiverRegistered = true;
                 appContext.registerReceiver(btActionReceiver, filterAction);
 
-                btMonitor.startDeviceDiscovery();
+                btConnection.startDeviceDiscovery();
                 break;
         }
     }

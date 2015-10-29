@@ -5,4 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_color" >
+
+    <!--TODO: Remove temperature Layout.-->
+    <include layout="@layout/battery_layout" />
+    <include layout="@layout/economic_layout" />
+    <include layout="@layout/performance_layout" />
+    <include layout="@layout/speed_layout" />
+    <include layout="@layout/temp_layout" />
 </RelativeLayout>
