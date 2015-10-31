@@ -1,22 +1,23 @@
 package br.unb.integration_project.driftkartapp;
 
-import android.bluetooth.BluetoothAdapter;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    PrepareDeviceCommunication prepareDeviceCommunication;
+    private PrepareDeviceCommunication prepareDeviceCommunication;
+    private AlertDialog searchDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        prepareDeviceCommunication = new PrepareDeviceCommunication(this,
-                BluetoothAdapter.getDefaultAdapter(), new IntentFilter());
+        prepareDeviceCommunication = new PrepareDeviceCommunication(this);
         prepareDeviceCommunication.establishBluetoothConnection();
     }
 
@@ -34,9 +35,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         //TODO: Destroy all BT allocated resources.
         super.onDestroy();
-        if(prepareDeviceCommunication.isReceiverRegistered) {
-            unregisterReceiver(prepareDeviceCommunication.getBtActionReceiver());
-        }
+        prepareDeviceCommunication.closeAllBlutoothResources();
+    }
+
+    public void showSearchDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setMessage("Fazendo busca...");
+        searchDialog = dialogBuilder.create();
+        searchDialog.show();
+    }
+
+    public void dismissSearchDialog() {
+        searchDialog.dismiss();
+    }
+
+    public void showConnTryAgainDialog(DialogInterface.OnClickListener pDialogListner) {
+        AlertDialog.Builder btAlertBuilder = new AlertDialog.Builder(this);
+        btAlertBuilder.setTitle("Sem conexão com o Kart.");
+        btAlertBuilder.setPositiveButton("Tentar denovo", pDialogListner);
+        btAlertBuilder.setNegativeButton("Sair", pDialogListner);
+
+        AlertDialog alertDialog = btAlertBuilder.create();
+        alertDialog.show();
+    }
+
+    public void showLongToastDialog(String pMessage) {
+        Toast.makeText(this, pMessage, Toast.LENGTH_LONG).show();
     }
 
     public void showEnableBluetoothDialog(String pIntentAction) {
