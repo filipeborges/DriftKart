@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 //TODO: This class should be: PrepareCommunication.
-//TODO: Create a Toasty method in MainActivity, and removes all Toasty references from this class.
 public class PrepareDeviceCommunication {
 
     private boolean isReceiverRegistered = false;
@@ -44,13 +43,13 @@ public class PrepareDeviceCommunication {
                 mainActivity.showSearchDialog();
 
             } else if(action.equals(BluetoothDevice.ACTION_FOUND)) {
-                BluetoothDevice foundedDevice = intent.getParcelableExtra(
-                        BluetoothDevice.EXTRA_DEVICE);
+                BluetoothDevice foundedDevice = intent.getParcelableExtra(BluetoothDevice
+                        .EXTRA_DEVICE);
                 if(foundedDevice.getAddress().equals(FAKE_KART_MAC_ADDRESS)) {
                     btConnection.cancelDeviceDiscovery();
                     device = foundedDevice;
-                    if(btConnection.pairWithFoundedDevice(device)
-                            == BluetoothConnection.PREVIOUSLY_PAIRED) {
+                    if(btConnection.pairWithFoundedDevice(device) == BluetoothConnection
+                            .PREVIOUSLY_PAIRED) {
                         mainActivity.dismissSearchDialog();
                         if(btConnection.openSerialConnToFoundedDevice(device) ==
                                 BluetoothConnection.SERIAL_CONN_OPENED) {
@@ -65,7 +64,6 @@ public class PrepareDeviceCommunication {
                 if(device == null) {
                     btConnection.cancelDeviceDiscovery();
                     mainActivity.dismissSearchDialog();
-
                     mainActivity.showConnTryAgainDialog(dialogListener);
                 }
 

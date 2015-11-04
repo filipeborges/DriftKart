@@ -5,7 +5,6 @@
         <!-- Customize your theme here. -->
     </style>
 
-
     <!-- global styles -->
     <style name="sensorLabelStyle">
         <item name="android:textColor">@color/text_color</item>
@@ -20,6 +19,12 @@
     <style name="sensorValueDefaultStyle">
         <item name="android:textSize">30sp</item>
         <item name="android:textColor">@color/text_color</item>
+    </style>
+
+    <!-- timer_layout -->
+    <style name="timerTextViewStyle">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textSize">50sp</item>
     </style>
 
     <!--speed_layout-->
