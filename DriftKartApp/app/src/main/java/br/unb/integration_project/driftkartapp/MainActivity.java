@@ -74,8 +74,10 @@ public class MainActivity extends AppCompatActivity {
         //TODO: Destroy all BT allocated resources.
         super.onDestroy();
         prepareDeviceCommunication.closeAllBlutoothResources();
-        timer.cancel();
-        timer.purge();
+        if(timer != null) {
+            timer.cancel();
+            timer.purge();
+        }
     }
 
     public void startTimer() {
