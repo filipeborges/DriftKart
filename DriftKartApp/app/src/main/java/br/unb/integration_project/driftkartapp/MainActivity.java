@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private Calendar timerCalendar = Calendar.getInstance();
     private String incrementedFmtTime;
     private Timer timer;
+    private ImageView timerImageView;
     private boolean isTimerStarted = false;
     private long lastExecutionTime = 0;
     private long incrementTime = 0;
@@ -38,9 +39,11 @@ public class MainActivity extends AppCompatActivity {
                 timer.cancel();
                 timer.purge();
                 isTimerStarted = false;
+                timerImageView.setImageResource(R.drawable.timer_press_state);
             }else {
                 isTimerStarted = true;
                 startTimer();
+                timerImageView.setImageResource(R.drawable.timer_started_press_state);
             }
         }
     };
@@ -51,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         timerCalendar.clear();
-        ImageView timerImageView = (ImageView)findViewById(R.id.timerImageView);
+        timerImageView = (ImageView)findViewById(R.id.timerImageView);
         timerImageView.setOnClickListener(timerImgListener);
         timerTextView = (TextView)findViewById(R.id.timerTextView);
 

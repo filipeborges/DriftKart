@@ -10,22 +10,27 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({BluetoothAdapter.class, BluetoothDevice.class, BluetoothSocket.class})
+@PrepareForTest({BluetoothAdapter.class, BluetoothDevice.class, BluetoothSocket.class,
+        BluetoothSocket.class})
 public class TestBluetoothConnection {
 
     BluetoothConnection btMonitor;
     Context mockContext;
     BluetoothAdapter btAdapterMock;
     BluetoothDevice btDeviceMock;
+    BluetoothSocket btSocket;
 
     @Before
     public void setUp() {
@@ -34,6 +39,19 @@ public class TestBluetoothConnection {
         mockContext = Mockito.mock(Context.class);
         btMonitor = new BluetoothConnection(mockContext, btAdapterMock);
         btDeviceMock = PowerMockito.mock(BluetoothDevice.class);
+        btSocket = PowerMockito.mock(BluetoothSocket.class);
+    }
+
+    @Test
+    public void testCloseBluetoothSocket() {
+        Mockito.when(btDeviceMock.getBondState()).thenReturn(BluetoothDevice.BOND_BONDED);
+        UUID serial_uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+        try {
+            Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(serial_uuid))
+                    .thenReturn(btSocket);
+        }catch(IOException ioe) {}
+        btMonitor.openSerialConnToFoundedDevice(btDeviceMock);
+        btMonitor.closeBluetoothSocket();
     }
 
     @Test
@@ -74,7 +92,6 @@ public class TestBluetoothConnection {
         btMonitor.pairWithFoundedDevice(btDeviceMock);
         Assert.assertEquals(BluetoothConnection.PREVIOUSLY_PAIRED,
                 btMonitor.pairWithFoundedDevice(btDeviceMock));
-
     }
 
     @Test
