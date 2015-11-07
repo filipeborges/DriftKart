@@ -20,8 +20,6 @@ public class PrepareDeviceCommunication {
     private BluetoothDevice device;
     private Handler uiHandler;
     private IntentFilter filterAction; //Needed for unit test mock.
-    //TODO: Pass real MAC Address of BT Adapter on Arduino.
-    //private final String FAKE_KART_MAC_ADDRESS = "94:51:03:B6:45:8D";
     private final String KART_MAC_ADDRESS = "20:15:02:03:53:66";
 
     private DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
@@ -93,27 +91,16 @@ public class PrepareDeviceCommunication {
         }
     };
 
-    public void showReadedData() {
-        Runnable dataReadedNotification = new Runnable() {
-            @Override
-            public void run() {
-                byte[] readedData = btConnection.getDataArray();
-                int lowByte = (int)readedData[0];
-                int highByte = (int)readedData[1] << 8;
-                int dataReaded = highByte | lowByte;
-                mainActivity.showLongToastDialog(String.valueOf(dataReaded));
-            }
-        };
-        btConnection.readData(2, uiHandler, dataReadedNotification);
-    }
-
     public Runnable getConnectNotification() {
         return new Runnable() {
             @Override
             public void run() {
-                //TODO: Start and transfer execution to SensordataHanddling
                 mainActivity.showLongToastDialog("Conectou1!");
-                showReadedData();
+                SensorDataHanddling sensorHanddling = new SensorDataHanddling(mainActivity,
+                        btConnection, uiHandler);
+                mainActivity.setSensorHanddling(sensorHanddling);
+                sensorHanddling.startSensorMonitoring();
+
             }
         };
     }

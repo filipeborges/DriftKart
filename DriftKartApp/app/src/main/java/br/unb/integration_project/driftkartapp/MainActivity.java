@@ -22,8 +22,10 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
 
     private PrepareDeviceCommunication prepareDeviceCommunication;
+    private SensorDataHanddling sensorHanddling;
     private AlertDialog searchDialog;
     private TextView timerTextView;
+    private TextView speedTextView;
     private Calendar timerCalendar = Calendar.getInstance();
     private String incrementedFmtTime;
     private Timer timer;
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         timerImageView = (ImageView)findViewById(R.id.timerImageView);
         timerImageView.setOnClickListener(timerImgListener);
         timerTextView = (TextView)findViewById(R.id.timerTextView);
+        speedTextView = (TextView)findViewById(R.id.speedometerTextView);
 
         prepareDeviceCommunication = new PrepareDeviceCommunication(this);
         prepareDeviceCommunication.establishBluetoothConnection();
@@ -81,6 +84,17 @@ public class MainActivity extends AppCompatActivity {
             timer.cancel();
             timer.purge();
         }
+        if(sensorHanddling != null) {
+            sensorHanddling.stopLoopedReadData();
+        }
+    }
+
+    public void setSensorHanddling(SensorDataHanddling pSensorHanddling) {
+        sensorHanddling = pSensorHanddling;
+    }
+
+    public void setSpeed(String pSpeed) {
+        speedTextView.setText(pSpeed);
     }
 
     public void startTimer() {

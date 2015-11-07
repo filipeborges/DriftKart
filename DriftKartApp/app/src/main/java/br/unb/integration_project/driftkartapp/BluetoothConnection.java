@@ -20,6 +20,7 @@ public class BluetoothConnection {
     private BluetoothSocket btSocket;
     private Context appContext;
     private byte[] dataArray;
+    private boolean isAllowedToContinue = true;
     public static final int PREVIOUSLY_PAIRED = 10;
     public static final int PAIRING_IN_PROGRESS = 11;
     public static final int PAIRING_EXCEPTION = 12;
@@ -70,6 +71,14 @@ public class BluetoothConnection {
         }
     }
 
+    public synchronized void setIsAllowedToContinue(boolean pValue) {
+        isAllowedToContinue = pValue;
+    }
+
+    public synchronized boolean getIsAllowedToContinue() {
+        return isAllowedToContinue;
+    }
+
     public void cancelDeviceDiscovery() {
         btAdapter.cancelDiscovery();
     }
@@ -105,7 +114,7 @@ public class BluetoothConnection {
     }
 
     public void readData(final int bytesCount, final Handler handler,
-                         final Runnable dataReadedNotification) {
+                         final Runnable dataReadedNotification, final boolean isLooped) {
         //TODO: Verify if btSocket is connected. InputStream is returned even if BTSOCKET is not connected.
         Thread readDataThread = new Thread(new Runnable() {
             @Override
@@ -113,11 +122,14 @@ public class BluetoothConnection {
                 try {
                     dataArray = new byte[bytesCount];
                     InputStream input = btSocket.getInputStream();
-                    for(int i = 0; i < bytesCount; i++) {
-                        dataArray[i] = (byte)input.read();
-                    }
+                    do {
+                        for (int i = 0; i < bytesCount; i++) {
+                            dataArray[i] = (byte)input.read();
+                        }
+                        handler.post(dataReadedNotification);
+                        //input.reset();
+                    }while (isLooped && getIsAllowedToContinue());
                     input.close();
-                    handler.post(dataReadedNotification);
                 }catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
