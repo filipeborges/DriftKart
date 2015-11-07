@@ -19,7 +19,7 @@ public class BluetoothConnection {
     private BluetoothAdapter btAdapter;
     private BluetoothSocket btSocket;
     private Context appContext;
-    private byte[] dataArray;
+    private int[] dataArray;
     private boolean isAllowedToContinue = true;
     public static final int PREVIOUSLY_PAIRED = 10;
     public static final int PAIRING_IN_PROGRESS = 11;
@@ -37,7 +37,7 @@ public class BluetoothConnection {
         appContext = pContext;
     }
 
-    public byte[] getDataArray() {
+    public int[] getDataArray() {
         return dataArray;
     }
 
@@ -120,14 +120,13 @@ public class BluetoothConnection {
             @Override
             public void run() {
                 try {
-                    dataArray = new byte[bytesCount];
+                    dataArray = new int[bytesCount];
                     InputStream input = btSocket.getInputStream();
                     do {
                         for (int i = 0; i < bytesCount; i++) {
-                            dataArray[i] = (byte)input.read();
+                            dataArray[i] = input.read();
                         }
                         handler.post(dataReadedNotification);
-                        //input.reset();
                     }while (isLooped && getIsAllowedToContinue());
                     input.close();
                 }catch (IOException ioe) {
@@ -139,7 +138,8 @@ public class BluetoothConnection {
     }
 
     public int openSerialConnToFoundedDevice(BluetoothDevice btDevice, final Handler uiHandler,
-                                             final Runnable connectNotification) {
+                                             final Runnable connectNotification,
+                                             final Runnable exceptionNotification) {
         final String SERIAL_UUID = "00001101-0000-1000-8000-00805F9B34FB";
 
         if(btDevice.getBondState() != BluetoothDevice.BOND_BONDED) {
@@ -158,7 +158,7 @@ public class BluetoothConnection {
                             btSocket.connect();
                             uiHandler.post(connectNotification);
                         }catch (IOException ioe) {
-                            ioe.printStackTrace();
+                            uiHandler.post(exceptionNotification);
                         }
                     }
                 });

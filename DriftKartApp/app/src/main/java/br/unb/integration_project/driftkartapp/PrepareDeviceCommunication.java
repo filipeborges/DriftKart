@@ -55,7 +55,7 @@ public class PrepareDeviceCommunication {
                             .PREVIOUSLY_PAIRED) {
                         mainActivity.dismissSearchDialog();
                         if(btConnection.openSerialConnToFoundedDevice(device, uiHandler,
-                                getConnectNotification()) == BluetoothConnection.SERIAL_CONN_OPENED) {
+                                getConnectNotification(), tryConnectionAgain()) == BluetoothConnection.SERIAL_CONN_OPENED) {
                             //TODO: Refactor this.
                         } else {
                             mainActivity.showLongToastDialog("Falha na Conexão!");
@@ -78,7 +78,7 @@ public class PrepareDeviceCommunication {
                     mainActivity.dismissSearchDialog();
                     mainActivity.showLongToastDialog("Pareamento: Sucesso!");
                     if(btConnection.openSerialConnToFoundedDevice(device, uiHandler,
-                            getConnectNotification()) == BluetoothConnection.SERIAL_CONN_OPENED) {
+                            getConnectNotification(), tryConnectionAgain()) == BluetoothConnection.SERIAL_CONN_OPENED) {
                         //TODO:Refactor this.
                     } else {
                         mainActivity.showLongToastDialog("Falha na Conexão!");
@@ -90,6 +90,16 @@ public class PrepareDeviceCommunication {
             }
         }
     };
+
+    public Runnable tryConnectionAgain() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                btConnection.openSerialConnToFoundedDevice(device, uiHandler,
+                        getConnectNotification(), tryConnectionAgain());
+            }
+        };
+    }
 
     public Runnable getConnectNotification() {
         return new Runnable() {

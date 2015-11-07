@@ -23,9 +23,9 @@ public class SensorDataHanddling {
         Runnable dataReadedNotification = new Runnable() {
             @Override
             public void run() {
-                byte[] readedData = btConnection.getDataArray();
-                int lowByte = (int)readedData[0];
-                int highByte = (int)readedData[1] << 8;
+                int[] readedData = btConnection.getDataArray();
+                int lowByte = readedData[0];
+                int highByte = readedData[1] << 8;
                 int dataReaded = highByte | lowByte;
                 mainActivity.setSpeed(String.valueOf(dataReaded));
             }
