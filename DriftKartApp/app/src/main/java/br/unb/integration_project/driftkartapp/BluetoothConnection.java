@@ -4,8 +4,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.os.Handler;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.UUID;
@@ -17,6 +19,7 @@ public class BluetoothConnection {
     private BluetoothAdapter btAdapter;
     private BluetoothSocket btSocket;
     private Context appContext;
+    private byte[] dataArray;
     public static final int PREVIOUSLY_PAIRED = 10;
     public static final int PAIRING_IN_PROGRESS = 11;
     public static final int PAIRING_EXCEPTION = 12;
@@ -33,6 +36,10 @@ public class BluetoothConnection {
         appContext = pContext;
     }
 
+    public byte[] getDataArray() {
+        return dataArray;
+    }
+
     public void closeBluetoothSocket() {
         if(btSocket != null) {
             try {
@@ -41,6 +48,10 @@ public class BluetoothConnection {
                 ioe.printStackTrace();
             }
         }
+    }
+
+    public BluetoothSocket getBtSocket() {
+        return btSocket;
     }
 
     public void startDeviceDiscovery() {
@@ -93,7 +104,30 @@ public class BluetoothConnection {
         return PREVIOUSLY_PAIRED;
     }
 
-    public int openSerialConnToFoundedDevice(BluetoothDevice btDevice) {
+    public void readData(final int bytesCount, final Handler handler,
+                         final Runnable dataReadedNotification) {
+        //TODO: Verify if btSocket is connected. InputStream is returned even if BTSOCKET is not connected.
+        Thread readDataThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    dataArray = new byte[bytesCount];
+                    InputStream input = btSocket.getInputStream();
+                    for(int i = 0; i < bytesCount; i++) {
+                        dataArray[i] = (byte)input.read();
+                    }
+                    input.close();
+                    handler.post(dataReadedNotification);
+                }catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
+        });
+        readDataThread.start();
+    }
+
+    public int openSerialConnToFoundedDevice(BluetoothDevice btDevice, final Handler uiHandler,
+                                             final Runnable connectNotification) {
         final String SERIAL_UUID = "00001101-0000-1000-8000-00805F9B34FB";
 
         if(btDevice.getBondState() != BluetoothDevice.BOND_BONDED) {
@@ -104,8 +138,19 @@ public class BluetoothConnection {
                 cancelDeviceDiscovery();
                 btSocket = btDevice.createRfcommSocketToServiceRecord(UUID
                         .fromString(SERIAL_UUID));
-                //TODO: This runs on UIThread sucessfully. Verify this better.
-                btSocket.connect();
+
+                Thread connectThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            btSocket.connect();
+                            uiHandler.post(connectNotification);
+                        }catch (IOException ioe) {
+                            ioe.printStackTrace();
+                        }
+                    }
+                });
+                connectThread.start();
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 return SERIAL_CONN_EXCEPTION;
