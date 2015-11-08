@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Looper;
 
-
 //TODO: This class should be: PrepareCommunication.
 public class PrepareDeviceCommunication {
 
@@ -37,11 +36,8 @@ public class PrepareDeviceCommunication {
                     btDevice = foundedDevice;
                     if(btConnection.pairWithFoundedDevice(btDevice) == BluetoothConnection
                             .PREVIOUSLY_PAIRED) {
-                        mainActivity.dismissSearchDialog();
                         if(btConnection.openSerialConnToDevice(btDevice, uiHandler,
-                                getConnectNotification(), getExceptionNotification()) == BluetoothConnection.SERIAL_CONN_OPENED) {
-                            //TODO: Refactor this.
-                        } else {
+                                getConnectNotification(), getExceptionNotification()) != BluetoothConnection.SERIAL_CONN_OPENED) {
                             mainActivity.showLongToastDialog("Falha na Conexão!");
                         }
                     }
@@ -59,12 +55,8 @@ public class PrepareDeviceCommunication {
                 final int PREVIOUS_BOND_STATE = intent.getIntExtra(BluetoothDevice
                         .EXTRA_PREVIOUS_BOND_STATE, -1);
                 if(BOND_STATE == BluetoothDevice.BOND_BONDED) {
-                    mainActivity.dismissSearchDialog();
-                    mainActivity.showLongToastDialog("Pareamento: Sucesso!");
                     if(btConnection.openSerialConnToDevice(btDevice, uiHandler,
-                            getConnectNotification(), getExceptionNotification()) == BluetoothConnection.SERIAL_CONN_OPENED) {
-                        //TODO:Refactor this.
-                    } else {
+                            getConnectNotification(), getExceptionNotification()) != BluetoothConnection.SERIAL_CONN_OPENED) {
                         mainActivity.showLongToastDialog("Falha na Conexão!");
                     }
                 } else if(PREVIOUS_BOND_STATE == BluetoothDevice.BOND_BONDING
@@ -89,7 +81,8 @@ public class PrepareDeviceCommunication {
         return new Runnable() {
             @Override
             public void run() {
-                mainActivity.showLongToastDialog("Conectou1!");
+                mainActivity.dismissSearchDialog();
+                mainActivity.showLongToastDialog("Conectado ao Kart!");
                 SensorDataHandling sensorHanddling = new SensorDataHandling(mainActivity,
                         btConnection, uiHandler);
                 mainActivity.setSensorHandling(sensorHanddling);
@@ -103,7 +96,7 @@ public class PrepareDeviceCommunication {
         uiHandler = new Handler(Looper.getMainLooper());
         mainActivity = pActivity;
         filterAction = new IntentFilter();
-        btConnection = new BluetoothConnection(mainActivity, BluetoothAdapter.getDefaultAdapter());
+        btConnection = new BluetoothConnection(BluetoothAdapter.getDefaultAdapter());
     }
 
     public void establishBluetoothConnection() {
@@ -115,7 +108,7 @@ public class PrepareDeviceCommunication {
                         ACTION_REQUEST_ENABLE);
                 break;
             case BluetoothConnection.NOT_HAVE_BLUETOOTH:
-                mainActivity.showLongToastDialog("Nao possui Bluetooth!");
+                mainActivity.showLongToastDialog("Dispositivo sem Bluetooth!");
                 break;
             case BluetoothConnection.BLUETOOTH_ONLINE:
                 if(!isReceiverRegistered) {
@@ -132,7 +125,7 @@ public class PrepareDeviceCommunication {
         }
     }
 
-    public void closeAllBluetoothResources() {
+    public void closeBluetoothResources() {
         btConnection.cancelDeviceDiscovery();
         if(isReceiverRegistered) {
             mainActivity.unregisterReceiver(btActionReceiver);

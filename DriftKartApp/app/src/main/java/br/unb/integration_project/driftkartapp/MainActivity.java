@@ -79,13 +79,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         //TODO: Destroy all BT allocated resources.
         super.onDestroy();
-        prepareDeviceCommunication.closeAllBluetoothResources();
+        prepareDeviceCommunication.closeBluetoothResources();
         if(timer != null) {
             timer.cancel();
             timer.purge();
-        }
-        if(sensorHandling != null) {
-            sensorHandling.stopLoopedReadData();
         }
     }
 
@@ -130,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showSearchDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setMessage("Fazendo busca...");
+        dialogBuilder.setMessage("Estabelecendo Conexão...");
         searchDialog = dialogBuilder.create();
         searchDialog.show();
     }

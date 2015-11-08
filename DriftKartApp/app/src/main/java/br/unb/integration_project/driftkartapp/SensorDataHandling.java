@@ -32,8 +32,4 @@ public class SensorDataHandling {
         };
         btConnection.readData(2, uiHandler, dataReadedNotification, true);
     }
-
-    public void stopLoopedReadData() {
-        btConnection.setIsAllowedToContinue(false);
-    }
 }

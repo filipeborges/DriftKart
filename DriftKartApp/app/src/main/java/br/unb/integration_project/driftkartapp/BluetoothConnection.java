@@ -3,7 +3,6 @@ package br.unb.integration_project.driftkartapp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.os.Handler;
 
 import java.io.IOException;
@@ -19,7 +18,6 @@ public class BluetoothConnection {
     private BluetoothAdapter btAdapter;
     private BluetoothSocket btSocket;
     private int[] dataArray;
-    private boolean isAllowedToContinue = true;
     public static final int PREVIOUSLY_PAIRED = 10;
     public static final int PAIRING_IN_PROGRESS = 11;
     public static final int PAIRING_EXCEPTION = 12;
@@ -31,7 +29,7 @@ public class BluetoothConnection {
     public static final int NOT_PREVIOUSLY_PAIRED = 32;
 
     //getDefaultAdapter() returns null if called from emulator.
-    public BluetoothConnection(Context pContext, BluetoothAdapter pBtAdapter) {
+    public BluetoothConnection(BluetoothAdapter pBtAdapter) {
         btAdapter = pBtAdapter;
     }
 
@@ -42,6 +40,8 @@ public class BluetoothConnection {
     public void closeBluetoothSocket() {
         if(btSocket != null) {
             try {
+                InputStream input = btSocket.getInputStream();
+                input.close();
                 btSocket.close();
             }catch (IOException ioe) {
                 ioe.printStackTrace();
@@ -63,14 +63,6 @@ public class BluetoothConnection {
         } else {
             return NOT_HAVE_BLUETOOTH;
         }
-    }
-
-    public synchronized void setIsAllowedToContinue(boolean pValue) {
-        isAllowedToContinue = pValue;
-    }
-
-    public synchronized boolean getIsAllowedToContinue() {
-        return isAllowedToContinue;
     }
 
     public void cancelDeviceDiscovery() {
@@ -121,7 +113,7 @@ public class BluetoothConnection {
                             dataArray[i] = input.read();
                         }
                         handler.post(dataReadedNotification);
-                    }while (isLooped && getIsAllowedToContinue());
+                    }while (isLooped);
                     input.close();
                 }catch (IOException ioe) {
                     ioe.printStackTrace();
