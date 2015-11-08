@@ -18,7 +18,6 @@ public class BluetoothConnection {
 
     private BluetoothAdapter btAdapter;
     private BluetoothSocket btSocket;
-    private Context appContext;
     private int[] dataArray;
     private boolean isAllowedToContinue = true;
     public static final int PREVIOUSLY_PAIRED = 10;
@@ -34,7 +33,6 @@ public class BluetoothConnection {
     //getDefaultAdapter() returns null if called from emulator.
     public BluetoothConnection(Context pContext, BluetoothAdapter pBtAdapter) {
         btAdapter = pBtAdapter;
-        appContext = pContext;
     }
 
     public int[] getDataArray() {
@@ -49,10 +47,6 @@ public class BluetoothConnection {
                 ioe.printStackTrace();
             }
         }
-    }
-
-    public BluetoothSocket getBtSocket() {
-        return btSocket;
     }
 
     public void startDeviceDiscovery() {
@@ -137,9 +131,9 @@ public class BluetoothConnection {
         readDataThread.start();
     }
 
-    public int openSerialConnToFoundedDevice(BluetoothDevice btDevice, final Handler uiHandler,
-                                             final Runnable connectNotification,
-                                             final Runnable exceptionNotification) {
+    public int openSerialConnToDevice(BluetoothDevice btDevice, final Handler handler,
+                                      final Runnable connectNotification,
+                                      final Runnable exceptionNotification) {
         final String SERIAL_UUID = "00001101-0000-1000-8000-00805F9B34FB";
 
         if(btDevice.getBondState() != BluetoothDevice.BOND_BONDED) {
@@ -156,9 +150,9 @@ public class BluetoothConnection {
                     public void run() {
                         try {
                             btSocket.connect();
-                            uiHandler.post(connectNotification);
+                            handler.post(connectNotification);
                         }catch (IOException ioe) {
-                            uiHandler.post(exceptionNotification);
+                            handler.post(exceptionNotification);
                         }
                     }
                 });

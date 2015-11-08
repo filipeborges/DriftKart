@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
@@ -17,25 +16,10 @@ public class PrepareDeviceCommunication {
     private boolean isReceiverRegistered = false;
     private MainActivity mainActivity;
     private BluetoothConnection btConnection;
-    private BluetoothDevice device;
+    private BluetoothDevice btDevice;
     private Handler uiHandler;
     private IntentFilter filterAction; //Needed for unit test mock.
     private final String KART_MAC_ADDRESS = "20:15:02:03:53:66";
-
-    private DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int buttonValue) {
-            switch (buttonValue) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    establishBluetoothConnection();
-                    break;
-                case DialogInterface.BUTTON_NEGATIVE:
-                    mainActivity.finish();
-                    break;
-            }
-        }
-    };
-
     private BroadcastReceiver btActionReceiver = new BroadcastReceiver() {
         //CAUTION: This method will run on main thread of process.
         @Override
@@ -50,12 +34,12 @@ public class PrepareDeviceCommunication {
                         .EXTRA_DEVICE);
                 if(foundedDevice.getAddress().equals(KART_MAC_ADDRESS)) {
                     btConnection.cancelDeviceDiscovery();
-                    device = foundedDevice;
-                    if(btConnection.pairWithFoundedDevice(device) == BluetoothConnection
+                    btDevice = foundedDevice;
+                    if(btConnection.pairWithFoundedDevice(btDevice) == BluetoothConnection
                             .PREVIOUSLY_PAIRED) {
                         mainActivity.dismissSearchDialog();
-                        if(btConnection.openSerialConnToFoundedDevice(device, uiHandler,
-                                getConnectNotification(), tryConnectionAgain()) == BluetoothConnection.SERIAL_CONN_OPENED) {
+                        if(btConnection.openSerialConnToDevice(btDevice, uiHandler,
+                                getConnectNotification(), getExceptionNotification()) == BluetoothConnection.SERIAL_CONN_OPENED) {
                             //TODO: Refactor this.
                         } else {
                             mainActivity.showLongToastDialog("Falha na Conexão!");
@@ -64,10 +48,10 @@ public class PrepareDeviceCommunication {
                 }
 
             } else if(action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
-                if(device == null) {
+                if(btDevice == null) {
                     btConnection.cancelDeviceDiscovery();
                     mainActivity.dismissSearchDialog();
-                    mainActivity.showConnTryAgainDialog(dialogListener);
+                    mainActivity.showConnTryAgainDialog();
                 }
 
             } else if(action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
@@ -77,8 +61,8 @@ public class PrepareDeviceCommunication {
                 if(BOND_STATE == BluetoothDevice.BOND_BONDED) {
                     mainActivity.dismissSearchDialog();
                     mainActivity.showLongToastDialog("Pareamento: Sucesso!");
-                    if(btConnection.openSerialConnToFoundedDevice(device, uiHandler,
-                            getConnectNotification(), tryConnectionAgain()) == BluetoothConnection.SERIAL_CONN_OPENED) {
+                    if(btConnection.openSerialConnToDevice(btDevice, uiHandler,
+                            getConnectNotification(), getExceptionNotification()) == BluetoothConnection.SERIAL_CONN_OPENED) {
                         //TODO:Refactor this.
                     } else {
                         mainActivity.showLongToastDialog("Falha na Conexão!");
@@ -91,12 +75,12 @@ public class PrepareDeviceCommunication {
         }
     };
 
-    public Runnable tryConnectionAgain() {
+    public Runnable getExceptionNotification() {
         return new Runnable() {
             @Override
             public void run() {
-                btConnection.openSerialConnToFoundedDevice(device, uiHandler,
-                        getConnectNotification(), tryConnectionAgain());
+                btConnection.openSerialConnToDevice(btDevice, uiHandler,
+                        getConnectNotification(), getExceptionNotification());
             }
         };
     }
@@ -106,9 +90,9 @@ public class PrepareDeviceCommunication {
             @Override
             public void run() {
                 mainActivity.showLongToastDialog("Conectou1!");
-                SensorDataHanddling sensorHanddling = new SensorDataHanddling(mainActivity,
+                SensorDataHandling sensorHanddling = new SensorDataHandling(mainActivity,
                         btConnection, uiHandler);
-                mainActivity.setSensorHanddling(sensorHanddling);
+                mainActivity.setSensorHandling(sensorHanddling);
                 sensorHanddling.startSensorMonitoring();
 
             }
@@ -148,7 +132,7 @@ public class PrepareDeviceCommunication {
         }
     }
 
-    public void closeAllBlutoothResources() {
+    public void closeAllBluetoothResources() {
         btConnection.cancelDeviceDiscovery();
         if(isReceiverRegistered) {
             mainActivity.unregisterReceiver(btActionReceiver);

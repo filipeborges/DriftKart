@@ -22,7 +22,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
 
     private PrepareDeviceCommunication prepareDeviceCommunication;
-    private SensorDataHanddling sensorHanddling;
+    private SensorDataHandling sensorHandling;
     private AlertDialog searchDialog;
     private TextView timerTextView;
     private TextView speedTextView;
@@ -79,18 +79,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         //TODO: Destroy all BT allocated resources.
         super.onDestroy();
-        prepareDeviceCommunication.closeAllBlutoothResources();
+        prepareDeviceCommunication.closeAllBluetoothResources();
         if(timer != null) {
             timer.cancel();
             timer.purge();
         }
-        if(sensorHanddling != null) {
-            sensorHanddling.stopLoopedReadData();
+        if(sensorHandling != null) {
+            sensorHandling.stopLoopedReadData();
         }
     }
 
-    public void setSensorHanddling(SensorDataHanddling pSensorHanddling) {
-        sensorHanddling = pSensorHanddling;
+    public void setSensorHandling(SensorDataHandling pSensorHandling) {
+        sensorHandling = pSensorHandling;
     }
 
     public void setSpeed(String pSpeed) {
@@ -139,11 +139,25 @@ public class MainActivity extends AppCompatActivity {
         searchDialog.dismiss();
     }
 
-    public void showConnTryAgainDialog(DialogInterface.OnClickListener pDialogListner) {
+    public void showConnTryAgainDialog() {
+        DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int buttonValue) {
+                switch (buttonValue) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        prepareDeviceCommunication.establishBluetoothConnection();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        finish();
+                        break;
+                }
+            }
+        };
+
         AlertDialog.Builder btAlertBuilder = new AlertDialog.Builder(this);
         btAlertBuilder.setTitle("Sem conexão com o Kart.");
-        btAlertBuilder.setPositiveButton("Tentar denovo", pDialogListner);
-        btAlertBuilder.setNegativeButton("Sair", pDialogListner);
+        btAlertBuilder.setPositiveButton("Tentar denovo", dialogListener);
+        btAlertBuilder.setNegativeButton("Sair", dialogListener);
 
         AlertDialog alertDialog = btAlertBuilder.create();
         alertDialog.show();

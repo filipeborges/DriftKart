@@ -2,14 +2,14 @@ package br.unb.integration_project.driftkartapp;
 
 import android.os.Handler;
 
-public class SensorDataHanddling {
+public class SensorDataHandling {
 
     private MainActivity mainActivity;
     private BluetoothConnection btConnection;
     private Handler uiHandler;
 
-    public SensorDataHanddling(MainActivity pMainActivity, BluetoothConnection pBtConnection,
-                               Handler pUiHandler) {
+    public SensorDataHandling(MainActivity pMainActivity, BluetoothConnection pBtConnection,
+                              Handler pUiHandler) {
         mainActivity = pMainActivity;
         btConnection = pBtConnection;
         uiHandler = pUiHandler;
