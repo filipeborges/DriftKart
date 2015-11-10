@@ -3,77 +3,113 @@ package br.unb.integration_project.driftkartapp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
+import android.os.Handler;
+
 import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({BluetoothAdapter.class, BluetoothDevice.class, BluetoothSocket.class,
-        BluetoothSocket.class})
+        BluetoothSocket.class, Handler.class})
 public class TestBluetoothConnection {
 
-    BluetoothConnection btMonitor;
-    Context mockContext;
+    BluetoothConnection btConnection;
     BluetoothAdapter btAdapterMock;
     BluetoothDevice btDeviceMock;
-    BluetoothSocket btSocket;
+    BluetoothSocket btSocketMock;
+    Handler handlerMock;
+    Runnable runnable;
 
     @Before
     public void setUp() {
+        runnable = new Runnable() {
+            @Override
+            public void run() {}
+        };
         btAdapterMock = PowerMockito.mock(BluetoothAdapter.class);
-        Mockito.when(btAdapterMock.isEnabled()).thenReturn(true);
-        mockContext = Mockito.mock(Context.class);
-        btMonitor = new BluetoothConnection(mockContext, btAdapterMock);
+        btConnection = new BluetoothConnection(btAdapterMock);
         btDeviceMock = PowerMockito.mock(BluetoothDevice.class);
-        btSocket = PowerMockito.mock(BluetoothSocket.class);
+        btSocketMock = PowerMockito.mock(BluetoothSocket.class);
+        handlerMock = PowerMockito.mock(Handler.class);
     }
 
     @Test
     public void testCloseBluetoothSocket() {
         Mockito.when(btDeviceMock.getBondState()).thenReturn(BluetoothDevice.BOND_BONDED);
         UUID serial_uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+        InputStream inputMock = Mockito.mock(InputStream.class);
         try {
             Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(serial_uuid))
-                    .thenReturn(btSocket);
+                    .thenReturn(btSocketMock);
+            Mockito.when(btSocketMock.getInputStream()).thenReturn(inputMock);
+
+            btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, runnable, runnable);
+            btConnection.closeBluetoothSocket();
+            Mockito.verify(inputMock, Mockito.times(1)).close();
+            Mockito.verify(btSocketMock, Mockito.times(1)).close();
         }catch(IOException ioe) {}
-        btMonitor.openSerialConnToFoundedDevice(btDeviceMock);
-        btMonitor.closeBluetoothSocket();
     }
 
     @Test
-    public void testOpenSerialConnToFoundedDevice() {
-        int not_paired_code = -1000;
-        Mockito.when(btDeviceMock.getBondState()).thenReturn(not_paired_code);
-        Assert.assertEquals(BluetoothConnection.NOT_PREVIOUSLY_PAIRED,
-                btMonitor.openSerialConnToFoundedDevice(btDeviceMock));
+    public void testGetDataArray() {
+        Assert.assertNull(btConnection.getDataArray());
+    }
 
-        /*Mockito.when(btDeviceMock.getBondState()).thenReturn(BluetoothDevice.BOND_BONDED);
-        BluetoothSocket btSocketMock = PowerMockito.mock(BluetoothSocket.class);
-        UUID uuidMock = PowerMockito.mock(UUID.class);
-        String SERIAL_UUID = "00001101-0000-1000-8000-00805F9B34FB";
-        PowerMockito.mockStatic(UUID.class);
-        Mockito.when(UUID.fromString(SERIAL_UUID)).thenReturn(uuidMock);
+    @Test
+    public void testOpenSerialConnToDevice() {
+        //Case of device not paired.
+        int random_code = -1000;
+        Mockito.when(btDeviceMock.getBondState()).thenReturn(random_code);
+        Assert.assertEquals(BluetoothConnection.NOT_PREVIOUSLY_PAIRED,
+                btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, runnable, runnable));
+
+        //Case of successful connection.
+        Mockito.when(btDeviceMock.getBondState()).thenReturn(BluetoothDevice.BOND_BONDED);
         try {
-            Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(uuidMock))
+            Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(Mockito.any(UUID.class)))
                     .thenReturn(btSocketMock);
         }catch (IOException ioe){}
-
         Assert.assertEquals(BluetoothConnection.SERIAL_CONN_OPENED,
-                btMonitor.openSerialConnToFoundedDevice(btDeviceMock));*/
+                btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, runnable, runnable));
+
+        //Case of connection exception.
+        try {
+            Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(Mockito.any(UUID.class)))
+                    .thenThrow(IOException.class);
+        }catch (IOException ioe){}
+        Assert.assertEquals(BluetoothConnection.SERIAL_CONN_EXCEPTION,
+                btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, runnable, runnable));
+    }
+
+    @Test
+    public void testReadData() {
+        Mockito.when(btDeviceMock.getBondState()).thenReturn(BluetoothDevice.BOND_BONDED);
+        try {
+            Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(Mockito.any(UUID.class)))
+                    .thenReturn(btSocketMock);
+            InputStream inputMock = Mockito.mock(InputStream.class);
+            Mockito.when(btSocketMock.getInputStream()).thenReturn(inputMock);
+
+            btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, runnable, runnable);
+            btConnection.readData(3, handlerMock, runnable, runnable, false);
+            Mockito.verify(inputMock, Mockito.timeout(200).times(3)).read();
+            Mockito.verify(inputMock, Mockito.timeout(200).times(1)).close();
+            Mockito.verify(handlerMock, Mockito.timeout(200).times(2)).post(Mockito.any(Runnable.class));
+        }catch (Exception ioe){}
     }
 
     @Test
@@ -82,45 +118,47 @@ public class TestBluetoothConnection {
         Set<BluetoothDevice> emptySet = new HashSet<BluetoothDevice>();
         Mockito.when(btAdapterMock.getBondedDevices()).thenReturn(emptySet);
         Assert.assertEquals(BluetoothConnection.PAIRING_IN_PROGRESS,
-                btMonitor.pairWithFoundedDevice(btDeviceMock));
+                btConnection.pairWithFoundedDevice(btDeviceMock));
 
         //Previously paired.
         Mockito.when(btDeviceMock.getAddress()).thenReturn("AAA");
         BluetoothDevice btDeviceMock2 = PowerMockito.mock(BluetoothDevice.class);
         emptySet.add(btDeviceMock2);
         Mockito.when(btDeviceMock2.getAddress()).thenReturn("AAA");
-        btMonitor.pairWithFoundedDevice(btDeviceMock);
+        btConnection.pairWithFoundedDevice(btDeviceMock);
         Assert.assertEquals(BluetoothConnection.PREVIOUSLY_PAIRED,
-                btMonitor.pairWithFoundedDevice(btDeviceMock));
+                btConnection.pairWithFoundedDevice(btDeviceMock));
     }
 
     @Test
     public void testVerifyBluetoothReady() {
-        Assert.assertEquals(BluetoothConnection.BLUETOOTH_ONLINE, btMonitor.verifyBluetoothReady());
+        Mockito.when(btAdapterMock.isEnabled()).thenReturn(true);
+        Assert.assertEquals(BluetoothConnection.BLUETOOTH_ONLINE, btConnection.verifyBluetoothReady());
         Mockito.when(btAdapterMock.isEnabled()).thenReturn(false);
-        Assert.assertEquals(BluetoothConnection.BLUETOOTH_OFFLINE, btMonitor.verifyBluetoothReady());
-        btMonitor = new BluetoothConnection(mockContext, null);
-        Assert.assertEquals(BluetoothConnection.NOT_HAVE_BLUETOOTH, btMonitor.verifyBluetoothReady());
-
+        Assert.assertEquals(BluetoothConnection.BLUETOOTH_OFFLINE, btConnection.verifyBluetoothReady());
+        btConnection = new BluetoothConnection(null);
+        Assert.assertEquals(BluetoothConnection.NOT_HAVE_BLUETOOTH, btConnection.verifyBluetoothReady());
     }
 
     @Test
     public void testStartDiscovery() {
-        btMonitor.startDeviceDiscovery();
+        btConnection.startDeviceDiscovery();
         Mockito.verify(btAdapterMock, Mockito.times(1)).startDiscovery();
     }
 
     @Test
     public void testCancelDiscovery() {
-        btMonitor.cancelDeviceDiscovery();
+        btConnection.cancelDeviceDiscovery();
         Mockito.verify(btAdapterMock, Mockito.times(1)).cancelDiscovery();
     }
 
     @After
     public void tearDown() {
         btAdapterMock = null;
-        mockContext = null;
-        btMonitor = null;
+        btConnection = null;
         btDeviceMock = null;
+        handlerMock = null;
+        runnable = null;
+        btSocketMock = null;
     }
 }

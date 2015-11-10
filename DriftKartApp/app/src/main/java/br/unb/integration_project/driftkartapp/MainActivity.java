@@ -22,7 +22,6 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
 
     private PrepareDeviceCommunication prepareDeviceCommunication;
-    private SensorDataHandling sensorHandling;
     private AlertDialog searchDialog;
     private TextView timerTextView;
     private TextView speedTextView;
@@ -84,10 +83,6 @@ public class MainActivity extends AppCompatActivity {
             timer.cancel();
             timer.purge();
         }
-    }
-
-    public void setSensorHandling(SensorDataHandling pSensorHandling) {
-        sensorHandling = pSensorHandling;
     }
 
     public void setSpeed(String pSpeed) {

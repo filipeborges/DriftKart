@@ -37,15 +37,11 @@ public class BluetoothConnection {
         return dataArray;
     }
 
-    public void closeBluetoothSocket() {
+    public void closeBluetoothSocket() throws IOException {
         if(btSocket != null) {
-            try {
-                InputStream input = btSocket.getInputStream();
-                input.close();
-                btSocket.close();
-            }catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
+            InputStream input = btSocket.getInputStream();
+            input.close();
+            btSocket.close();
         }
     }
 
@@ -100,7 +96,8 @@ public class BluetoothConnection {
     }
 
     public void readData(final int bytesCount, final Handler handler,
-                         final Runnable dataReadedNotification, final boolean isLooped) {
+                         final Runnable dataReadedNotification, final Runnable exceptionNotification,
+                         final boolean isLooped) {
         //TODO: Verify if btSocket is connected. InputStream is returned even if BTSOCKET is not connected.
         Thread readDataThread = new Thread(new Runnable() {
             @Override
@@ -117,6 +114,7 @@ public class BluetoothConnection {
                     input.close();
                 }catch (IOException ioe) {
                     ioe.printStackTrace();
+                    handler.post(exceptionNotification);
                 }
             }
         });

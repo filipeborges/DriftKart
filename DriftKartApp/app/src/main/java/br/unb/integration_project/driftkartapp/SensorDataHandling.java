@@ -30,6 +30,6 @@ public class SensorDataHandling {
                 mainActivity.setSpeed(String.valueOf(dataReaded));
             }
         };
-        btConnection.readData(2, uiHandler, dataReadedNotification, true);
+        btConnection.readData(2, uiHandler, dataReadedNotification, null, true);
     }
 }

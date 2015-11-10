@@ -9,6 +9,8 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Looper;
 
+import java.io.IOException;
+
 //TODO: This class should be: PrepareCommunication.
 public class PrepareDeviceCommunication {
 
@@ -85,7 +87,6 @@ public class PrepareDeviceCommunication {
                 mainActivity.showLongToastDialog("Conectado ao Kart!");
                 SensorDataHandling sensorHanddling = new SensorDataHandling(mainActivity,
                         btConnection, uiHandler);
-                mainActivity.setSensorHandling(sensorHanddling);
                 sensorHanddling.startSensorMonitoring();
 
             }
@@ -130,6 +131,10 @@ public class PrepareDeviceCommunication {
         if(isReceiverRegistered) {
             mainActivity.unregisterReceiver(btActionReceiver);
         }
-        btConnection.closeBluetoothSocket();
+        try {
+            btConnection.closeBluetoothSocket();
+        }catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
     }
 }
