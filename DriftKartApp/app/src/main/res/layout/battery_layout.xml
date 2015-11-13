@@ -10,7 +10,7 @@
         android:id="@+id/batteryImageView"
         android:layout_width="62dp"
         android:layout_height="90dp"
-        style="@style/imageViewMockStyle"/>
+        style="@style/batteryImageViewStyle"/>
 
     <TextView
         android:id="@+id/batteryTextView"
@@ -28,7 +28,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginTop="25dp"
-        android:text="15%"
-        style="@style/sensorValueDefaultStyle" />
+        android:layout_marginRight="3dp"
+        android:text="10%"
+        style="@style/batteryValueTextViewStyle" />
 
 </RelativeLayout>

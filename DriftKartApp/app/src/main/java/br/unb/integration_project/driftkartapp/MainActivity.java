@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog searchDialog;
     private TextView timerTextView;
     private TextView speedTextView;
+    private int lastBatteryCharge = -1;
+    private ImageView batteryImageView;
+    private TextView batteryValueTextView;
     private Calendar timerCalendar = Calendar.getInstance();
     private String incrementedFmtTime;
     private Timer timer;
@@ -55,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         timerCalendar.clear();
+        batteryImageView = (ImageView)findViewById(R.id.batteryImageView);
+        batteryValueTextView = (TextView)findViewById(R.id.batteryValueTextView);
         timerImageView = (ImageView)findViewById(R.id.timerImageView);
         timerImageView.setOnClickListener(timerImgListener);
         timerTextView = (TextView)findViewById(R.id.timerTextView);
@@ -62,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         prepareDeviceCommunication = new PrepareDeviceCommunication(this);
         prepareDeviceCommunication.establishBluetoothConnection();
+    //    hideNavBar();
     }
 
     @Override
@@ -73,6 +80,40 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
+
+    public void hideNavBar() {
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                if(visibility != View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) {
+                    decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                }
+            }
+        });
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    /*@Override
+    public void onResume() {
+        super.onResume();
+        final View decorView = getWindow().getDecorView();
+        final int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        decorView.setOnSystemUiVisibilityChangeListener
+                (new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+                        if (visibility != uiOptions) {
+                            // The system bars are visible.
+                            View decorView = getWindow().getDecorView();
+                            decorView.setSystemUiVisibility(uiOptions);
+                        }else {
+                            View decorView = getWindow().getDecorView();
+                        }
+                    }
+                });
+        decorView.setSystemUiVisibility(uiOptions);
+    }*/
 
     @Override
     protected void onDestroy() {
@@ -157,6 +198,43 @@ public class MainActivity extends AppCompatActivity {
 
     public void showLongToastDialog(String pMessage) {
         Toast.makeText(this, pMessage, Toast.LENGTH_LONG).show();
+    }
+
+    public void setBattery(int pBatteryCharge) {
+        //TODO: XML layout cannot have android:src image setted.
+        //TODO: Set the real image reference on "batteryLayout".
+        int batteryLayout, currentBatteryCharge = 0;
+        if(90 < pBatteryCharge && pBatteryCharge <=100) {
+            //batteryLayout = 100;
+            currentBatteryCharge = 100;
+        }else if(80 < pBatteryCharge && pBatteryCharge <=90) {
+            //batteryLayout = 90;
+            currentBatteryCharge = 90;
+        }else if(60 < pBatteryCharge && pBatteryCharge <=80) {
+            //batteryLayout = 80;
+            currentBatteryCharge = 80;
+        }else if(50 < pBatteryCharge && pBatteryCharge <=60) {
+            //batteryLayout = 60;
+            currentBatteryCharge = 60;
+        }else if(30 < pBatteryCharge && pBatteryCharge <=50) {
+            //batteryLayout = 50;
+            currentBatteryCharge = 50;
+        }else if(20 < pBatteryCharge && pBatteryCharge <=30) {
+            //batteryLayout = 30;
+            currentBatteryCharge = 30;
+        }else if(10 < pBatteryCharge && pBatteryCharge <=20) {
+            //batteryLayout = 20;
+            currentBatteryCharge = 20;
+        }else if(pBatteryCharge <=10) {
+            //batteryLayout = 10;
+            currentBatteryCharge = 10;
+        }
+
+        if(lastBatteryCharge != currentBatteryCharge) {
+         //   batteryImageView.setImageResource(batteryLayout);
+            lastBatteryCharge = currentBatteryCharge;
+        }
+        batteryValueTextView.setText(String.valueOf(pBatteryCharge));
     }
 
     public void showEnableBluetoothDialog(String pIntentAction) {

@@ -18,6 +18,7 @@ public class BluetoothConnection {
     private BluetoothAdapter btAdapter;
     private BluetoothSocket btSocket;
     private int[] dataArray;
+    private boolean canWriteToArray;
     public static final int PREVIOUSLY_PAIRED = 10;
     public static final int PAIRING_IN_PROGRESS = 11;
     public static final int PAIRING_EXCEPTION = 12;
@@ -35,6 +36,14 @@ public class BluetoothConnection {
 
     public int[] getDataArray() {
         return dataArray;
+    }
+
+    public synchronized void setCanWriteToArray(boolean pValue) {
+        canWriteToArray = pValue;
+    }
+
+    public synchronized boolean canWriteToArray() {
+        return canWriteToArray;
     }
 
     public void closeBluetoothSocket() throws IOException {
@@ -103,13 +112,17 @@ public class BluetoothConnection {
             @Override
             public void run() {
                 try {
+                    setCanWriteToArray(true);
                     dataArray = new int[bytesCount];
                     InputStream input = btSocket.getInputStream();
                     do {
-                        for (int i = 0; i < bytesCount; i++) {
-                            dataArray[i] = input.read();
+                        if(canWriteToArray()) {
+                            for (int i = 0; i < bytesCount; i++) {
+                                dataArray[i] = input.read();
+                            }
+                            setCanWriteToArray(false);
+                            handler.post(dataReadedNotification);
                         }
-                        handler.post(dataReadedNotification);
                     }while (isLooped);
                     input.close();
                 }catch (IOException ioe) {

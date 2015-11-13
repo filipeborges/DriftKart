@@ -2,4 +2,6 @@
 <resources>
     <color name="background_color">#FFF</color>
     <color name="text_color">#000</color>
+    <color name="battery_low">#dc1a1a</color>
+    <color name="battery_high">#2db722</color>
 </resources>
