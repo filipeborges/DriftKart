@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -51,6 +52,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    private View.OnLongClickListener timerTxtLongListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            if(!isTimerStarted) {
+                Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+                vibrator.vibrate(80);
+                timerCalendar.clear();
+                timerTextView.setText("00:00:00");
+                return true;
+            }else {
+                return false;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void hideNavBar() {
+    public void hideNavStatusBar() {
         final View decorView = getWindow().getDecorView();
         final int HIDE_NAV_STATUS_BAR = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                 View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -93,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                             decorView.setSystemUiVisibility(HIDE_NAV_STATUS_BAR);
                         }
                     };
-                    new Handler(getMainLooper()).postDelayed(hideUiRunnable, 1000);
+                    new Handler(getMainLooper()).postDelayed(hideUiRunnable, 3000);
                 }
             }
         });
@@ -116,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startTimer() {
+        timerTextView.setOnLongClickListener(timerTxtLongListener);
         TimerTask incrementTimerTask = new TimerTask() {
             Handler uiHandler = new Handler(Looper.getMainLooper());
             Runnable setTimerValueTask = new Runnable() {
@@ -155,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void dismissSearchDialog() {
         searchDialog.dismiss();
-        hideNavBar();
+        hideNavStatusBar();
     }
 
     public void showConnTryAgainDialog() {
