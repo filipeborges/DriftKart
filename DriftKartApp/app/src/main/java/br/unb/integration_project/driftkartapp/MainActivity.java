@@ -8,7 +8,6 @@ import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
         prepareDeviceCommunication = new PrepareDeviceCommunication(this);
         prepareDeviceCommunication.establishBluetoothConnection();
-    //    hideNavBar();
     }
 
     @Override
@@ -83,37 +81,24 @@ public class MainActivity extends AppCompatActivity {
 
     public void hideNavBar() {
         final View decorView = getWindow().getDecorView();
+        final int HIDE_NAV_STATUS_BAR = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
             @Override
             public void onSystemUiVisibilityChange(int visibility) {
-                if(visibility != View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) {
-                    decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                if(visibility == View.SYSTEM_UI_FLAG_VISIBLE) {
+                    Runnable hideUiRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            decorView.setSystemUiVisibility(HIDE_NAV_STATUS_BAR);
+                        }
+                    };
+                    new Handler(getMainLooper()).postDelayed(hideUiRunnable, 1000);
                 }
             }
         });
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        decorView.setSystemUiVisibility(HIDE_NAV_STATUS_BAR);
     }
-
-    /*@Override
-    public void onResume() {
-        super.onResume();
-        final View decorView = getWindow().getDecorView();
-        final int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-        decorView.setOnSystemUiVisibilityChangeListener
-                (new View.OnSystemUiVisibilityChangeListener() {
-                    @Override
-                    public void onSystemUiVisibilityChange(int visibility) {
-                        if (visibility != uiOptions) {
-                            // The system bars are visible.
-                            View decorView = getWindow().getDecorView();
-                            decorView.setSystemUiVisibility(uiOptions);
-                        }else {
-                            View decorView = getWindow().getDecorView();
-                        }
-                    }
-                });
-        decorView.setSystemUiVisibility(uiOptions);
-    }*/
 
     @Override
     protected void onDestroy() {
@@ -170,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void dismissSearchDialog() {
         searchDialog.dismiss();
+        hideNavBar();
     }
 
     public void showConnTryAgainDialog() {
