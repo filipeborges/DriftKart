@@ -24,17 +24,20 @@ public class SensorDataHandling {
             @Override
             public void run() {
                 int[] readedData = btConnection.getDataArray();
-                int lowByte = readedData[0];
-                int highByte = readedData[1] << 8;
+                char flag = (char)readedData[0];
+                int lowByte = readedData[1];
+                int highByte = readedData[2] << 8;
                 //Give permission to readData() to read next bytes of data.
                 btConnection.setCanWriteToArray(true);
                 int dataReaded = highByte | lowByte;
-                //TODO: Test this before.
-                //TODO: Verify if buffer data is from SPEED or BATTERY.
-                mainActivity.setSpeed(String.valueOf(dataReaded));
+                if(flag == 'S') {
+                    mainActivity.setSpeed(dataReaded);
+                }else {
+                    mainActivity.setBattery(dataReaded);
+                }
             }
         };
-        btConnection.readData(2, uiHandler, dataReadedNotification, null, true);
+        btConnection.readData(3, uiHandler, dataReadedNotification, null, true);
     }
 
 }

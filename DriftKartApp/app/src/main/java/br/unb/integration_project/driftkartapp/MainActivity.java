@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setSpeed(String pSpeed) {
-        speedTextView.setText(pSpeed);
+    public void setSpeed(int pSpeed) {
+        speedTextView.setText(String.valueOf(pSpeed));
     }
 
     public void startTimer() {
@@ -204,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setBattery(int pBatteryCharge) {
         int batteryLayout, currentBatteryCharge;
+        int textColor = R.color.battery_high;
 
         if(90 < pBatteryCharge && pBatteryCharge <=100) {
             batteryLayout = R.drawable.battery_100;
@@ -226,16 +227,20 @@ public class MainActivity extends AppCompatActivity {
         }else if(10 < pBatteryCharge && pBatteryCharge <=20) {
             batteryLayout = R.drawable.battery_20;
             currentBatteryCharge = 20;
+            textColor = R.color.battery_low;
         }else {
             batteryLayout = R.drawable.battery_10;
             currentBatteryCharge = 10;
+            textColor = R.color.battery_low;
         }
 
         if(lastBatteryCharge != currentBatteryCharge) {
             batteryImageView.setImageResource(batteryLayout);
             lastBatteryCharge = currentBatteryCharge;
+            batteryValueTextView.setTextColor(getResources().getColor(textColor));
         }
-        batteryValueTextView.setText(String.valueOf(pBatteryCharge));
+        String batteryPercentage = String.valueOf(pBatteryCharge)+"%";
+        batteryValueTextView.setText(batteryPercentage);
     }
 
     public void showEnableBluetoothDialog(String pIntentAction) {
