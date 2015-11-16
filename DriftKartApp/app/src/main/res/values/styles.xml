@@ -22,9 +22,6 @@
     </style>
 
     <!-- battery_layout -->
-    <style name="batteryImageViewStyle">
-        <item name="android:src">@drawable/battery_10</item>
-    </style>
     <style name="batteryValueTextViewStyle">
         <item name="android:textSize">30sp</item>
         <item name="android:textColor">@color/battery_low</item>

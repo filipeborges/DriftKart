@@ -203,37 +203,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setBattery(int pBatteryCharge) {
-        //TODO: XML layout cannot have android:src image setted.
-        //TODO: Set the real image reference on "batteryLayout".
-        int batteryLayout, currentBatteryCharge = 0;
+        int batteryLayout, currentBatteryCharge;
+
         if(90 < pBatteryCharge && pBatteryCharge <=100) {
-            //batteryLayout = 100;
+            batteryLayout = R.drawable.battery_100;
             currentBatteryCharge = 100;
         }else if(80 < pBatteryCharge && pBatteryCharge <=90) {
-            //batteryLayout = 90;
+            batteryLayout = R.drawable.battery_90;
             currentBatteryCharge = 90;
         }else if(60 < pBatteryCharge && pBatteryCharge <=80) {
-            //batteryLayout = 80;
+            batteryLayout = R.drawable.battery_80;
             currentBatteryCharge = 80;
         }else if(50 < pBatteryCharge && pBatteryCharge <=60) {
-            //batteryLayout = 60;
+            batteryLayout = R.drawable.battery_60;
             currentBatteryCharge = 60;
         }else if(30 < pBatteryCharge && pBatteryCharge <=50) {
-            //batteryLayout = 50;
+            batteryLayout = R.drawable.battery_50;
             currentBatteryCharge = 50;
         }else if(20 < pBatteryCharge && pBatteryCharge <=30) {
-            //batteryLayout = 30;
+            batteryLayout = R.drawable.battery_30;
             currentBatteryCharge = 30;
         }else if(10 < pBatteryCharge && pBatteryCharge <=20) {
-            //batteryLayout = 20;
+            batteryLayout = R.drawable.battery_20;
             currentBatteryCharge = 20;
-        }else if(pBatteryCharge <=10) {
-            //batteryLayout = 10;
+        }else {
+            batteryLayout = R.drawable.battery_10;
             currentBatteryCharge = 10;
         }
 
         if(lastBatteryCharge != currentBatteryCharge) {
-         //   batteryImageView.setImageResource(batteryLayout);
+            batteryImageView.setImageResource(batteryLayout);
             lastBatteryCharge = currentBatteryCharge;
         }
         batteryValueTextView.setText(String.valueOf(pBatteryCharge));

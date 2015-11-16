@@ -9,8 +9,7 @@
     <ImageView
         android:id="@+id/batteryImageView"
         android:layout_width="62dp"
-        android:layout_height="90dp"
-        style="@style/batteryImageViewStyle"/>
+        android:layout_height="90dp" />
 
     <TextView
         android:id="@+id/batteryTextView"
