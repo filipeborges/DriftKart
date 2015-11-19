@@ -8,8 +8,10 @@ import android.os.Looper;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private int lastBatteryCharge = -1;
     private ImageView batteryImageView;
     private TextView batteryValueTextView;
+    private ProgressBar batteryProgressBar;
     private Calendar timerCalendar = Calendar.getInstance();
     private String incrementedFmtTime;
     private Timer timer;
@@ -75,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         timerCalendar.clear();
         batteryImageView = (ImageView)findViewById(R.id.batteryImageView);
         batteryValueTextView = (TextView)findViewById(R.id.batteryValueTextView);
+        batteryProgressBar = (ProgressBar)findViewById(R.id.batteryProgressBar);
         timerImageView = (ImageView)findViewById(R.id.timerImageView);
         timerImageView.setOnClickListener(timerImgListener);
         timerTextView = (TextView)findViewById(R.id.timerTextView);
@@ -101,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
             @Override
             public void onSystemUiVisibilityChange(int visibility) {
-                if(visibility == View.SYSTEM_UI_FLAG_VISIBLE) {
+                if (visibility == View.SYSTEM_UI_FLAG_VISIBLE) {
                     Runnable hideUiRunnable = new Runnable() {
                         @Override
                         public void run() {
@@ -163,8 +167,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showSearchDialog() {
+        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        View progressBarView = inflater.inflate(R.layout.search_progress_bar, null);
+
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setMessage("Estabelecendo Conexão...");
+        dialogBuilder.setView(progressBarView);
         searchDialog = dialogBuilder.create();
         searchDialog.show();
     }
@@ -205,6 +212,10 @@ public class MainActivity extends AppCompatActivity {
     public void setBattery(int pBatteryCharge) {
         int batteryLayout, currentBatteryCharge;
         int textColor = R.color.battery_high;
+
+        if(batteryProgressBar.getVisibility() == View.VISIBLE) {
+            batteryProgressBar.setVisibility(View.GONE);
+        }
 
         if(90 < pBatteryCharge && pBatteryCharge <=100) {
             batteryLayout = R.drawable.battery_100;

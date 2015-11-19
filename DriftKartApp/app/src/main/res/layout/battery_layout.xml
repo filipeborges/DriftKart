@@ -28,7 +28,12 @@
         android:layout_alignParentRight="true"
         android:layout_marginTop="25dp"
         android:layout_marginRight="3dp"
-        android:text="10%"
         style="@style/batteryValueTextViewStyle" />
+
+    <ProgressBar
+        android:id="@+id/batteryProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 
 </RelativeLayout>
