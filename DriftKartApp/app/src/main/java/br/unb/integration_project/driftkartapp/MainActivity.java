@@ -1,8 +1,12 @@
 package br.unb.integration_project.driftkartapp;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Vibrator;
@@ -69,6 +73,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    private BroadcastReceiver cellBatteryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String intentAction = intent.getAction();
+            if(intentAction.equals(Intent.ACTION_BATTERY_CHANGED)) {
+                int currentBatteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                //TODO: Show "currentBatteryLevel" on correct layout.
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         timerImageView.setOnClickListener(timerImgListener);
         timerTextView = (TextView)findViewById(R.id.timerTextView);
         speedTextView = (TextView)findViewById(R.id.speedometerTextView);
+
+        IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(cellBatteryReceiver, iFilter);
 
         prepareDeviceCommunication = new PrepareDeviceCommunication(this);
         prepareDeviceCommunication.establishBluetoothConnection();
@@ -128,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             timer.cancel();
             timer.purge();
         }
+        unregisterReceiver(cellBatteryReceiver);
     }
 
     public void setSpeed(int pSpeed) {
