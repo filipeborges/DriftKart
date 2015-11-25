@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-    private BroadcastReceiver cellBatteryReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver phoneBatteryReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String intentAction = intent.getAction();
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         speedTextView = (TextView)findViewById(R.id.speedometerTextView);
 
         IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(cellBatteryReceiver, iFilter);
+        registerReceiver(phoneBatteryReceiver, iFilter);
 
         prepareDeviceCommunication = new PrepareDeviceCommunication(this);
         prepareDeviceCommunication.establishBluetoothConnection();
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             timer.cancel();
             timer.purge();
         }
-        unregisterReceiver(cellBatteryReceiver);
+        unregisterReceiver(phoneBatteryReceiver);
     }
 
     public void setSpeed(int pSpeed) {
@@ -272,26 +272,35 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(isKartBattery) {
-            if (batteryProgressBar.getVisibility() == View.VISIBLE) {
-                batteryProgressBar.setVisibility(View.GONE);
-            }
-
-            if (lastBatteryCharge != currentBatteryCharge) {
-                batteryImageView.setImageResource(batteryLayout);
-                lastBatteryCharge = currentBatteryCharge;
-                batteryValueTextView.setTextColor(getResources().getColor(textColor));
-            }
-            String batteryPercentage = String.valueOf(pBatteryCharge) + "%";
-            batteryValueTextView.setText(batteryPercentage);
+            setKartBattery(pBatteryCharge, currentBatteryCharge, textColor, batteryLayout);
         }else {
-            if(phoneLastBattCharge != currentBatteryCharge) {
-                phoneBattImageView.setImageResource(phoneBattLayout);
-                phoneLastBattCharge = currentBatteryCharge;
-                phoneBattValueTextView.setTextColor(getResources().getColor(textColor));
-            }
-            String batteryPercentage = String.valueOf(pBatteryCharge) + "%";
-            phoneBattValueTextView.setText(batteryPercentage);
+            setPhoneBattery(pBatteryCharge, currentBatteryCharge, textColor, phoneBattLayout);
         }
+    }
+
+    public void setPhoneBattery(int pBattValue, int pCurrentBattCharge, int pTextColor,
+                                int pBattLayout) {
+        if(phoneLastBattCharge != pCurrentBattCharge) {
+            phoneBattImageView.setImageResource(pBattLayout);
+            phoneLastBattCharge = pCurrentBattCharge;
+            phoneBattValueTextView.setTextColor(getResources().getColor(pTextColor));
+        }
+        String batteryPercentage = String.valueOf(pBattValue) + "%";
+        phoneBattValueTextView.setText(batteryPercentage);
+    }
+
+    public void setKartBattery(int pBattValue, int pCurrentBattCharge, int pTextColor,
+                               int pBattLayout) {
+        if (batteryProgressBar.getVisibility() == View.VISIBLE) {
+            batteryProgressBar.setVisibility(View.GONE);
+        }
+        if (lastBatteryCharge != pCurrentBattCharge) {
+            batteryImageView.setImageResource(pBattLayout);
+            lastBatteryCharge = pCurrentBattCharge;
+            batteryValueTextView.setTextColor(getResources().getColor(pTextColor));
+        }
+        String batteryPercentage = String.valueOf(pBattValue) + "%";
+        batteryValueTextView.setText(batteryPercentage);
     }
 
     public void showEnableBluetoothDialog(String pIntentAction) {
