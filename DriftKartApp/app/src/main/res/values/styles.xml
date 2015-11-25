@@ -12,21 +12,10 @@
         <item name="android:textStyle">italic</item>
     </style>
 
-    <style name="imageViewMockStyle">
-        <item name="android:src">#349</item>
-    </style>
-
     <style name="sensorValueDefaultStyle">
         <item name="android:textSize">30sp</item>
         <item name="android:textColor">@color/text_color</item>
     </style>
-
-    <!-- battery_layout -->
-    <style name="batteryValueTextViewStyle">
-        <item name="android:textSize">30sp</item>
-        <item name="android:textColor">@color/battery_low</item>
-    </style>
-
 
     <!-- timer_layout -->
     <style name="timerTextViewStyle">

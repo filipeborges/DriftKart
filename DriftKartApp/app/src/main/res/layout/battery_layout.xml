@@ -13,11 +13,11 @@
 
     <TextView
         android:id="@+id/batteryTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/batteryImageView"
-        android:paddingTop="5dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
         android:text="@string/battery_label"
         style="@style/sensorLabelStyle" />
 
@@ -28,12 +28,14 @@
         android:layout_alignParentRight="true"
         android:layout_marginTop="25dp"
         android:layout_marginRight="3dp"
-        style="@style/batteryValueTextViewStyle" />
+        style="@style/sensorValueDefaultStyle" />
 
     <ProgressBar
         android:id="@+id/batteryProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/batteryTextView"
+        android:layout_marginBottom="10dp"
         android:layout_centerInParent="true" />
 
 </RelativeLayout>

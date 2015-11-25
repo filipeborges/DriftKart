@@ -3,6 +3,7 @@
     <string name="speedometer_unit">km/h</string>
     <string name="economic_label">Ecônomico</string>
     <string name="performance_label">Desempenho</string>
-    <string name="battery_label">Autonomia</string>
+    <string name="battery_label">Autonomia Kart</string>
+    <string name="phone_battery_label">Autonomia Celular</string>
     <string name="temp_label">Temperatura</string>
 </resources>

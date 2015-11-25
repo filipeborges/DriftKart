@@ -33,7 +33,7 @@ public class SensorDataHandling {
                 if(flag == 'S') {
                     mainActivity.setSpeed(dataReaded);
                 }else {
-                    mainActivity.setBattery(dataReaded);
+                    mainActivity.setBattery(dataReaded, true);
                 }
             }
         };

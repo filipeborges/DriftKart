@@ -27,12 +27,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
-
     private PrepareDeviceCommunication prepareDeviceCommunication;
     private AlertDialog searchDialog;
     private TextView timerTextView;
     private TextView speedTextView;
+    private int phoneLastBattCharge = -1;
     private int lastBatteryCharge = -1;
+    private ImageView phoneBattImageView;
+    private TextView phoneBattValueTextView;
     private ImageView batteryImageView;
     private TextView batteryValueTextView;
     private ProgressBar batteryProgressBar;
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             String intentAction = intent.getAction();
             if(intentAction.equals(Intent.ACTION_BATTERY_CHANGED)) {
                 int currentBatteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                //TODO: Show "currentBatteryLevel" on correct layout.
+                setBattery(currentBatteryLevel, false);
             }
         }
     };
@@ -90,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         timerCalendar.clear();
+        phoneBattImageView = (ImageView)findViewById(R.id.phoneBattImageView);
+        phoneBattValueTextView = (TextView)findViewById(R.id.phoneBattValueTextView);
         batteryImageView = (ImageView)findViewById(R.id.batteryImageView);
         batteryValueTextView = (TextView)findViewById(R.id.batteryValueTextView);
         batteryProgressBar = (ProgressBar)findViewById(R.id.batteryProgressBar);
@@ -227,49 +231,67 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, pMessage, Toast.LENGTH_LONG).show();
     }
 
-    public void setBattery(int pBatteryCharge) {
-        int batteryLayout, currentBatteryCharge;
+    public void setBattery(int pBatteryCharge, boolean isKartBattery) {
+        int batteryLayout, phoneBattLayout, currentBatteryCharge;
         int textColor = R.color.battery_high;
-
-        if(batteryProgressBar.getVisibility() == View.VISIBLE) {
-            batteryProgressBar.setVisibility(View.GONE);
-        }
 
         if(90 < pBatteryCharge && pBatteryCharge <=100) {
             batteryLayout = R.drawable.battery_100;
+            phoneBattLayout = R.drawable.phone_battery_100;
             currentBatteryCharge = 100;
         }else if(80 < pBatteryCharge && pBatteryCharge <=90) {
             batteryLayout = R.drawable.battery_90;
+            phoneBattLayout = R.drawable.phone_battery_90;
             currentBatteryCharge = 90;
         }else if(60 < pBatteryCharge && pBatteryCharge <=80) {
             batteryLayout = R.drawable.battery_80;
+            phoneBattLayout = R.drawable.phone_battery_80;
             currentBatteryCharge = 80;
         }else if(50 < pBatteryCharge && pBatteryCharge <=60) {
             batteryLayout = R.drawable.battery_60;
+            phoneBattLayout = R.drawable.phone_battery_60;
             currentBatteryCharge = 60;
         }else if(30 < pBatteryCharge && pBatteryCharge <=50) {
             batteryLayout = R.drawable.battery_50;
+            phoneBattLayout = R.drawable.phone_battery_50;
             currentBatteryCharge = 50;
         }else if(20 < pBatteryCharge && pBatteryCharge <=30) {
             batteryLayout = R.drawable.battery_30;
+            phoneBattLayout = R.drawable.phone_battery_30;
             currentBatteryCharge = 30;
         }else if(10 < pBatteryCharge && pBatteryCharge <=20) {
             batteryLayout = R.drawable.battery_20;
+            phoneBattLayout = R.drawable.phone_battery_20;
             currentBatteryCharge = 20;
             textColor = R.color.battery_low;
         }else {
             batteryLayout = R.drawable.battery_10;
+            phoneBattLayout = R.drawable.phone_battery_10;
             currentBatteryCharge = 10;
             textColor = R.color.battery_low;
         }
 
-        if(lastBatteryCharge != currentBatteryCharge) {
-            batteryImageView.setImageResource(batteryLayout);
-            lastBatteryCharge = currentBatteryCharge;
-            batteryValueTextView.setTextColor(getResources().getColor(textColor));
+        if(isKartBattery) {
+            if (batteryProgressBar.getVisibility() == View.VISIBLE) {
+                batteryProgressBar.setVisibility(View.GONE);
+            }
+
+            if (lastBatteryCharge != currentBatteryCharge) {
+                batteryImageView.setImageResource(batteryLayout);
+                lastBatteryCharge = currentBatteryCharge;
+                batteryValueTextView.setTextColor(getResources().getColor(textColor));
+            }
+            String batteryPercentage = String.valueOf(pBatteryCharge) + "%";
+            batteryValueTextView.setText(batteryPercentage);
+        }else {
+            if(phoneLastBattCharge != currentBatteryCharge) {
+                phoneBattImageView.setImageResource(phoneBattLayout);
+                phoneLastBattCharge = currentBatteryCharge;
+                phoneBattValueTextView.setTextColor(getResources().getColor(textColor));
+            }
+            String batteryPercentage = String.valueOf(pBatteryCharge) + "%";
+            phoneBattValueTextView.setText(batteryPercentage);
         }
-        String batteryPercentage = String.valueOf(pBatteryCharge)+"%";
-        batteryValueTextView.setText(batteryPercentage);
     }
 
     public void showEnableBluetoothDialog(String pIntentAction) {

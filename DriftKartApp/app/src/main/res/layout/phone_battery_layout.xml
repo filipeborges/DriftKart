@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tempRelLay"
+    android:id="@+id/phoneBattRelLay"
     android:layout_width="125dp"
     android:layout_height="125dp"
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true">
 
     <ImageView
-        android:id="@+id/tempImageView"
+        android:id="@+id/phoneBattImageView"
         android:layout_width="62dp"
         android:layout_height="90dp" />
 
     <TextView
-        android:id="@+id/tempTextView"
-        android:layout_below="@+id/tempImageView"
+        android:id="@+id/phoneBattTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:paddingTop="5dp"
-        android:text="@string/temp_label"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="@string/phone_battery_label"
         style="@style/sensorLabelStyle" />
 
     <TextView
-        android:id="@+id/tempValueTextView"
+        android:id="@+id/phoneBattValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginTop="25dp"
-        android:text="45 C"
+        android:layout_marginLeft="3dp"
         style="@style/sensorValueDefaultStyle" />
 
 </RelativeLayout>
