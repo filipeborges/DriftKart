@@ -16,10 +16,6 @@ public class SensorDataHandling {
     }
 
     public void startSensorMonitoring() {
-        showReadedData();
-    }
-
-    public void showReadedData() {
         Runnable dataReadedNotification = new Runnable() {
             @Override
             public void run() {

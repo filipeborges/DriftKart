@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView batteryImageView;
     private TextView batteryValueTextView;
     private ProgressBar batteryProgressBar;
+    private CheckBox ecoCheckbox;
+    private CheckBox perfCheckbox;
     private Calendar timerCalendar = Calendar.getInstance();
     private String incrementedFmtTime;
     private Timer timer;
@@ -45,6 +48,23 @@ public class MainActivity extends AppCompatActivity {
     private boolean isTimerStarted = false;
     private long lastExecutionTime = 0;
     private long incrementTime = 0;
+    private View.OnClickListener checkBoxListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            CheckBox checkBoxView  = (CheckBox)view;
+            //If Checkbox is not checked, isChecked() returns true.
+            if(checkBoxView.isChecked()) {
+                if(checkBoxView.getId() == R.id.economicCheckBox) {
+                    ((CheckBox)findViewById(R.id.performanceCheckBox)).setChecked(false);
+                }else {
+                    ((CheckBox)findViewById(R.id.economicCheckBox)).setChecked(false);
+                }
+                checkBoxView.setChecked(true);
+            }else {
+                checkBoxView.setChecked(true);
+            }
+        }
+    };
     private View.OnClickListener timerImgListener = new View.OnClickListener() {
         @Override
         public void onClick(View timerImgView) {
@@ -101,6 +121,10 @@ public class MainActivity extends AppCompatActivity {
         timerImageView.setOnClickListener(timerImgListener);
         timerTextView = (TextView)findViewById(R.id.timerTextView);
         speedTextView = (TextView)findViewById(R.id.speedometerTextView);
+        ecoCheckbox = (CheckBox)findViewById(R.id.economicCheckBox);
+        perfCheckbox = (CheckBox)findViewById(R.id.performanceCheckBox);
+        ecoCheckbox.setOnClickListener(checkBoxListener);
+        perfCheckbox.setOnClickListener(checkBoxListener);
 
         IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(phoneBatteryReceiver, iFilter);
