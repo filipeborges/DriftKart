@@ -7,6 +7,7 @@ import android.os.Handler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class BluetoothConnection {
     private BluetoothSocket btSocket;
     private int[] dataArray;
     private boolean canWriteToArray;
+    private OutputStream outStream;
     public static final int PREVIOUSLY_PAIRED = 10;
     public static final int PAIRING_IN_PROGRESS = 11;
     public static final int PAIRING_EXCEPTION = 12;
@@ -46,11 +48,14 @@ public class BluetoothConnection {
         return canWriteToArray;
     }
 
-    public void closeBluetoothSocket() throws IOException {
+    public void closeBluetoothResources() throws IOException {
         if(btSocket != null) {
             InputStream input = btSocket.getInputStream();
             input.close();
             btSocket.close();
+        }
+        if(outStream != null) {
+            outStream.close();
         }
     }
 
@@ -91,6 +96,7 @@ public class BluetoothConnection {
             if(previouslyPairedBtDevice == null) {
                 //Creating bluetooth pairing.
                 try {
+                    //TODO: Try to change reflection to createBond().
                     Method method = pBtDevice.getClass().getMethod("createBond", (Class[])null);
                     method.invoke(pBtDevice, (Object[])null);
 
@@ -102,6 +108,20 @@ public class BluetoothConnection {
             }
         }
         return PREVIOUSLY_PAIRED;
+    }
+
+    public int sendData(byte[] dataArray) {
+        try {
+            if(outStream == null) {
+                outStream = btSocket.getOutputStream();
+            }
+            outStream.write(dataArray);
+        }catch (IOException ioe) {
+            return -1;
+        }catch (NullPointerException npe) {
+            return -2;
+        }
+        return dataArray.length;
     }
 
     public void readData(final int bytesCount, final Handler handler,
@@ -141,7 +161,7 @@ public class BluetoothConnection {
 
         if(btDevice.getBondState() != BluetoothDevice.BOND_BONDED) {
             return NOT_PREVIOUSLY_PAIRED;
-        } else {
+        }else {
             try {
                 //Just to make sure that other apps not started discovery process.
                 cancelDeviceDiscovery();

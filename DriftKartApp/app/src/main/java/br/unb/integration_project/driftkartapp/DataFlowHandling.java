@@ -2,17 +2,27 @@ package br.unb.integration_project.driftkartapp;
 
 import android.os.Handler;
 
-public class SensorDataHandling {
+//TODO: Refactor this class, so it can readData and sendData
+public class DataFlowHandling {
 
     private MainActivity mainActivity;
     private BluetoothConnection btConnection;
     private Handler uiHandler;
 
-    public SensorDataHandling(MainActivity pMainActivity, BluetoothConnection pBtConnection,
-                              Handler pUiHandler) {
+    public DataFlowHandling(MainActivity pMainActivity, BluetoothConnection pBtConnection,
+                            Handler pUiHandler) {
         mainActivity = pMainActivity;
         btConnection = pBtConnection;
         uiHandler = pUiHandler;
+    }
+
+    public void setEngineMode(byte pEngineMode) {
+        byte[] engineFlagData = new byte[1];
+        engineFlagData[0] = pEngineMode;
+        int returnSendData = btConnection.sendData(engineFlagData);
+        if(returnSendData < 0) {
+            mainActivity.showLongToastDialog("Não conectado com o Kart!");
+        }
     }
 
     public void startSensorMonitoring() {

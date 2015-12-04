@@ -18,6 +18,7 @@ public class PrepareDeviceCommunication {
     private MainActivity mainActivity;
     private BluetoothConnection btConnection;
     private BluetoothDevice btDevice;
+    private DataFlowHandling dataFlowHandling;
     private Handler uiHandler;
     private IntentFilter filterAction; //Needed for unit test mock.
     private final String KART_MAC_ADDRESS = "20:15:02:03:53:66";
@@ -85,10 +86,7 @@ public class PrepareDeviceCommunication {
             public void run() {
                 mainActivity.dismissSearchDialog();
                 mainActivity.showLongToastDialog("Conectado ao Kart!");
-                SensorDataHandling sensorHanddling = new SensorDataHandling(mainActivity,
-                        btConnection, uiHandler);
-                sensorHanddling.startSensorMonitoring();
-
+                dataFlowHandling.startSensorMonitoring();
             }
         };
     }
@@ -98,11 +96,15 @@ public class PrepareDeviceCommunication {
         mainActivity = pActivity;
         filterAction = new IntentFilter();
         btConnection = new BluetoothConnection(BluetoothAdapter.getDefaultAdapter());
+        dataFlowHandling = new DataFlowHandling(mainActivity, btConnection, uiHandler);
+    }
+
+    public DataFlowHandling getDataFlowHandling() {
+        return dataFlowHandling;
     }
 
     public void establishBluetoothConnection() {
         //TODO: Handdling the case of device not discoverable, but bluetooth ON.
-
         switch (btConnection.verifyBluetoothReady()) {
             case BluetoothConnection.BLUETOOTH_OFFLINE:
                 mainActivity.showEnableBluetoothDialog(BluetoothAdapter.
@@ -132,9 +134,16 @@ public class PrepareDeviceCommunication {
             mainActivity.unregisterReceiver(btActionReceiver);
         }
         try {
-            btConnection.closeBluetoothSocket();
+            btConnection.closeBluetoothResources();
         }catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+    //Created for unit test purposes.
+    public void setAttributesForUnitTest(BluetoothConnection btConnectionMock,
+                                         DataFlowHandling dataFlowHandlingMock) {
+        btConnection = btConnectionMock;
+        dataFlowHandling = dataFlowHandlingMock;
     }
 }

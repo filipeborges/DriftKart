@@ -39,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView batteryImageView;
     private TextView batteryValueTextView;
     private ProgressBar batteryProgressBar;
-    private CheckBox ecoCheckbox;
-    private CheckBox perfCheckbox;
     private Calendar timerCalendar = Calendar.getInstance();
     private String incrementedFmtTime;
     private Timer timer;
@@ -55,8 +53,10 @@ public class MainActivity extends AppCompatActivity {
             //If Checkbox is not checked, isChecked() returns true.
             if(checkBoxView.isChecked()) {
                 if(checkBoxView.getId() == R.id.economicCheckBox) {
+                    prepareDeviceCommunication.getDataFlowHandling().setEngineMode((byte)0);
                     ((CheckBox)findViewById(R.id.performanceCheckBox)).setChecked(false);
                 }else {
+                    prepareDeviceCommunication.getDataFlowHandling().setEngineMode((byte)1);
                     ((CheckBox)findViewById(R.id.economicCheckBox)).setChecked(false);
                 }
                 checkBoxView.setChecked(true);
@@ -121,8 +121,8 @@ public class MainActivity extends AppCompatActivity {
         timerImageView.setOnClickListener(timerImgListener);
         timerTextView = (TextView)findViewById(R.id.timerTextView);
         speedTextView = (TextView)findViewById(R.id.speedometerTextView);
-        ecoCheckbox = (CheckBox)findViewById(R.id.economicCheckBox);
-        perfCheckbox = (CheckBox)findViewById(R.id.performanceCheckBox);
+        CheckBox ecoCheckbox = (CheckBox)findViewById(R.id.economicCheckBox);
+        CheckBox perfCheckbox = (CheckBox)findViewById(R.id.performanceCheckBox);
         ecoCheckbox.setOnClickListener(checkBoxListener);
         perfCheckbox.setOnClickListener(checkBoxListener);
 
