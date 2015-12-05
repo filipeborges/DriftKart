@@ -42,10 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private Calendar timerCalendar = Calendar.getInstance();
     private String incrementedFmtTime;
     private Timer timer;
+    private TimerTask incrementTimerTask;
     private ImageView timerImageView;
     private boolean isTimerStarted = false;
-    private long lastExecutionTime = 0;
-    private long incrementTime = 0;
+    private long pausedTime = 0;
+    private long txtViewSettedTime = 0;
     private View.OnClickListener checkBoxListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -69,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View timerImgView) {
             if(isTimerStarted) {
-                lastExecutionTime = System.currentTimeMillis();
+                pausedTime = System.currentTimeMillis();
+                incrementTimerTask.cancel();
                 timer.cancel();
                 timer.purge();
                 isTimerStarted = false;
@@ -120,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
         timerImageView = (ImageView)findViewById(R.id.timerImageView);
         timerImageView.setOnClickListener(timerImgListener);
         timerTextView = (TextView)findViewById(R.id.timerTextView);
+        timerTextView.setOnLongClickListener(timerTxtLongListener);
         speedTextView = (TextView)findViewById(R.id.speedometerTextView);
         CheckBox ecoCheckbox = (CheckBox)findViewById(R.id.economicCheckBox);
         CheckBox perfCheckbox = (CheckBox)findViewById(R.id.performanceCheckBox);
@@ -157,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                             decorView.setSystemUiVisibility(HIDE_NAV_STATUS_BAR);
                         }
                     };
-                    new Handler(getMainLooper()).postDelayed(hideUiRunnable, 3000);
+                    new Handler(getMainLooper()).postDelayed(hideUiRunnable, 5000);
                 }
             }
         });
@@ -180,14 +183,13 @@ public class MainActivity extends AppCompatActivity {
         speedTextView.setText(String.valueOf(pSpeed));
     }
 
-    private void startTimer() {
-        timerTextView.setOnLongClickListener(timerTxtLongListener);
-        TimerTask incrementTimerTask = new TimerTask() {
+    private TimerTask getNewIncrementTimerTask() {
+        return new TimerTask() {
             Handler uiHandler = new Handler(Looper.getMainLooper());
             Runnable setTimerValueTask = new Runnable() {
                 @Override
                 public void run() {
-                    incrementTime = System.currentTimeMillis();
+                    txtViewSettedTime = System.currentTimeMillis();
                     timerTextView.setText(incrementedFmtTime);
                 }
             };
@@ -201,12 +203,19 @@ public class MainActivity extends AppCompatActivity {
                 uiHandler.post(setTimerValueTask);
             }
         };
+    }
 
+    private void startTimer() {
+        incrementTimerTask = getNewIncrementTimerTask();
         timer = new Timer();
-        if(lastExecutionTime != 0) {
-            long delayTime = 1000 - (lastExecutionTime - incrementTime);
-            timer.schedule(incrementTimerTask, delayTime, 1000);
-            lastExecutionTime = 0;
+        if(pausedTime != 0) {
+            long delayTime = 1000 - (pausedTime - txtViewSettedTime);
+            try {
+                timer.schedule(incrementTimerTask, delayTime, 1000);
+            }catch (IllegalArgumentException iae) {
+                timer.schedule(incrementTimerTask, 0, 1000);
+            }
+            pausedTime = 0;
         }else {
             timer.schedule(incrementTimerTask, 0, 1000);
         }
