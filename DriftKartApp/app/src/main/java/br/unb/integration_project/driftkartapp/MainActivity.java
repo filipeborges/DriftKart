@@ -8,11 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -41,9 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar batteryProgressBar;
     private Calendar timerCalendar = Calendar.getInstance();
     private String incrementedFmtTime;
+    private Handler uiHandler;
     private Timer timer;
     private TimerTask incrementTimerTask;
     private ImageView timerImageView;
+    private Runnable hideUiRunnable;
     private boolean isTimerStarted = false;
     private long pausedTime = 0;
     private long txtViewSettedTime = 0;
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        uiHandler = new Handler(getMainLooper());
         timerCalendar.clear();
         phoneBattImageView = (ImageView)findViewById(R.id.phoneBattImageView);
         phoneBattValueTextView = (TextView)findViewById(R.id.phoneBattValueTextView);
@@ -154,14 +157,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSystemUiVisibilityChange(int visibility) {
                 if (visibility == View.SYSTEM_UI_FLAG_VISIBLE) {
-                    Runnable hideUiRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            decorView.setSystemUiVisibility(HIDE_NAV_STATUS_BAR);
-                        }
-                    };
-                    new Handler(getMainLooper()).postDelayed(hideUiRunnable, 5000);
+                    if(hideUiRunnable == null) {
+                        hideUiRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                decorView.setSystemUiVisibility(HIDE_NAV_STATUS_BAR);
+                            }
+                        };
+                    }
+                    uiHandler.postDelayed(hideUiRunnable, 5000);
                 }
+            }
+        });
+        decorView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                uiHandler.removeCallbacks(hideUiRunnable);
+                uiHandler.postDelayed(hideUiRunnable, 5000);
+                return false;
             }
         });
         decorView.setSystemUiVisibility(HIDE_NAV_STATUS_BAR);
@@ -185,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
 
     private TimerTask getNewIncrementTimerTask() {
         return new TimerTask() {
-            Handler uiHandler = new Handler(Looper.getMainLooper());
             Runnable setTimerValueTask = new Runnable() {
                 @Override
                 public void run() {
