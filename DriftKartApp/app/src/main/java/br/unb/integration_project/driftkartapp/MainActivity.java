@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         speedTextView = (TextView)findViewById(R.id.speedometerTextView);
         CheckBox ecoCheckbox = (CheckBox)findViewById(R.id.economicCheckBox);
         CheckBox perfCheckbox = (CheckBox)findViewById(R.id.performanceCheckBox);
+        perfCheckbox.setChecked(true);
         ecoCheckbox.setOnClickListener(checkBoxListener);
         perfCheckbox.setOnClickListener(checkBoxListener);
 

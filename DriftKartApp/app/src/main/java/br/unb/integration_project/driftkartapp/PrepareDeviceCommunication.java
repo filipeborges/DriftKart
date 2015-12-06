@@ -86,6 +86,7 @@ public class PrepareDeviceCommunication {
             public void run() {
                 mainActivity.dismissSearchDialog();
                 mainActivity.showLongToastDialog("Conectado ao Kart!");
+                dataFlowHandling.setEngineMode((byte)1);
                 dataFlowHandling.startSensorMonitoring();
             }
         };
