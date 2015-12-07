@@ -18,6 +18,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -48,19 +49,63 @@ public class TestBluetoothConnection {
     }
 
     @Test
+    public void testSendData() {
+        OutputStream outStreamMock = Mockito.mock(OutputStream.class);
+        Runnable notification = Mockito.mock(Runnable.class);
+        Mockito.when(btDeviceMock.getBondState()).thenReturn(BluetoothDevice.BOND_BONDED);
+        UUID uuidRecord = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+        try {
+            Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(uuidRecord))
+                    .thenReturn(btSocketMock);
+            Mockito.when(btSocketMock.getOutputStream()).thenReturn(outStreamMock);
+        }catch(IOException ioe){}
+        btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, notification, notification);
+
+        //Case of best scenario.
+        byte[] fakeArray = new byte[5];
+        int returnSendData = btConnection.sendData(fakeArray);
+        Assert.assertEquals(fakeArray.length, returnSendData);
+
+        //Case of NullPointerException.
+        try {
+            btConnection = new BluetoothConnection(btAdapterMock);
+            Mockito.when(btSocketMock.getOutputStream()).thenReturn(null);
+            btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, notification, notification);
+        }catch (IOException ioe){}
+        returnSendData = btConnection.sendData(fakeArray);
+        Assert.assertEquals(-2, returnSendData);
+
+        try {
+            Thread.sleep(100);
+        }catch (InterruptedException ie){}
+
+        //Case of IOException.
+        try {
+            btConnection = new BluetoothConnection(btAdapterMock);
+            Mockito.when(btSocketMock.getOutputStream()).thenThrow(new IOException());
+            btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, notification, notification);
+        }catch (IOException ioe){}
+        returnSendData = btConnection.sendData(fakeArray);
+        Assert.assertEquals(-1, returnSendData);
+    }
+
+    @Test
     public void testCloseBluetoothSocket() {
         Mockito.when(btDeviceMock.getBondState()).thenReturn(BluetoothDevice.BOND_BONDED);
+        OutputStream outStreamMock = Mockito.mock(OutputStream.class);
         UUID serial_uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
         InputStream inputMock = Mockito.mock(InputStream.class);
         try {
             Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(serial_uuid))
                     .thenReturn(btSocketMock);
             Mockito.when(btSocketMock.getInputStream()).thenReturn(inputMock);
-
+            Mockito.when(btSocketMock.getOutputStream()).thenReturn(outStreamMock);
             btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, runnable, runnable);
-            btConnection.closeBluetoothSocket();
+            btConnection.sendData(new byte[1]);
+            btConnection.closeBluetoothResources();
             Mockito.verify(inputMock, Mockito.times(1)).close();
             Mockito.verify(btSocketMock, Mockito.times(1)).close();
+            Mockito.verify(outStreamMock, Mockito.times(1)).close();
         }catch(IOException ioe) {}
     }
 
