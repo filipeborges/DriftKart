@@ -11,6 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -134,19 +135,31 @@ public class TestBluetoothConnection {
         //Case of connection exception.
         try {
             Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(Mockito.any(UUID.class)))
-                    .thenThrow(IOException.class);
+                    .thenReturn(btSocketMock);
+            Mockito.doThrow(new IOException()).when(btSocketMock).connect();
+            handlerMock = PowerMockito.mock(Handler.class);
+            btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, runnable, runnable);
+            Mockito.verify(handlerMock, Mockito.timeout(200).times(1))
+                    .post(Mockito.any(Runnable.class));
+        }catch(IOException ioe){}
+
+        //Case of create rfcomm exception.
+        try {
+            Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(Mockito.any(UUID.class)))
+                    .thenThrow(new IOException());
         }catch (IOException ioe){}
         Assert.assertEquals(BluetoothConnection.SERIAL_CONN_EXCEPTION,
                 btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, runnable, runnable));
+
     }
 
     @Test
     public void testReadData() {
+        InputStream inputMock = Mockito.mock(InputStream.class);
         Mockito.when(btDeviceMock.getBondState()).thenReturn(BluetoothDevice.BOND_BONDED);
         try {
             Mockito.when(btDeviceMock.createRfcommSocketToServiceRecord(Mockito.any(UUID.class)))
                     .thenReturn(btSocketMock);
-            InputStream inputMock = Mockito.mock(InputStream.class);
             Mockito.when(btSocketMock.getInputStream()).thenReturn(inputMock);
 
             btConnection.openSerialConnToDevice(btDeviceMock, handlerMock, runnable, runnable);
@@ -154,6 +167,13 @@ public class TestBluetoothConnection {
             Mockito.verify(inputMock, Mockito.timeout(200).times(3)).read();
             Mockito.verify(inputMock, Mockito.timeout(200).times(1)).close();
             Mockito.verify(handlerMock, Mockito.timeout(200).times(2)).post(Mockito.any(Runnable.class));
+
+            //Case of IOException.
+            Mockito.when(inputMock.read()).thenThrow(new IOException());
+            handlerMock = PowerMockito.mock(Handler.class);
+            btConnection.readData(3, handlerMock, runnable, runnable, false);
+            Mockito.verify(handlerMock, Mockito.timeout(200).times(1)).post(Mockito.any(Runnable.class));
+
         }catch (Exception ioe){}
     }
 
