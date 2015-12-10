@@ -4,6 +4,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Looper;
+
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,15 +36,33 @@ public class TestPrepareDeviceCommunication {
     }
 
     @Test
+    public void testGetConnectNotification() {
+        Runnable connectNotification = deviceComm.getConnectNotification();
+        Assert.assertNotNull(connectNotification);
+    }
+
+    @Test
+    public void testGetExceptionNotification() {
+        Runnable exceptionNotification = deviceComm.getExceptionNotification();
+        Assert.assertNotNull(exceptionNotification);
+    }
+
+    @Test
     public void testEstablishBluetoothConnection() {
-        BluetoothConnection btConnection = Mockito.mock(BluetoothConnection.class);
-        deviceComm.setAttributesForUnitTest(btConnection, new DataFlowHandling(mockActivity, btConnection, Mockito.mock(Handler.class)));
-        Mockito.when(btConnection.verifyBluetoothReady()).thenReturn(BluetoothConnection.NOT_HAVE_BLUETOOTH);
+        BluetoothConnection btConnectionMock = Mockito.mock(BluetoothConnection.class);
+        Handler uiHandlerMock = Mockito.mock(Handler.class);
+        DataFlowHandling dtFlowHandlingMock = new DataFlowHandling(mockActivity,
+                btConnectionMock, uiHandlerMock);
+        deviceComm.setAttributesForUnitTest(btConnectionMock, dtFlowHandlingMock);
+        Mockito.when(btConnectionMock.verifyBluetoothReady())
+                .thenReturn(BluetoothConnection.NOT_HAVE_BLUETOOTH);
         deviceComm.establishBluetoothConnection();
         Mockito.verify(mockActivity, Mockito.times(1)).showLongToastDialog(Matchers.anyString());
-        Mockito.when(btConnection.verifyBluetoothReady()).thenReturn(BluetoothConnection.BLUETOOTH_OFFLINE);
+        Mockito.when(btConnectionMock.verifyBluetoothReady())
+                .thenReturn(BluetoothConnection.BLUETOOTH_OFFLINE);
         deviceComm.establishBluetoothConnection();
-        Mockito.verify(mockActivity, Mockito.times(1)).showEnableBluetoothDialog(Matchers.anyString());
+        Mockito.verify(mockActivity, Mockito.times(1))
+                .showEnableBluetoothDialog(Matchers.anyString());
     }
 
     @Test
