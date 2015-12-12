@@ -20,9 +20,9 @@ public class PrepareDeviceCommunication {
     private BluetoothDevice btDevice;
     private DataFlowHandling dataFlowHandling;
     private Handler uiHandler;
-    private IntentFilter filterAction; //Needed for unit test mock.
+    private IntentFilter filterAction;
     private final String KART_MAC_ADDRESS = "20:15:02:03:53:66";
-    private BroadcastReceiver btActionReceiver = new BroadcastReceiver() {
+    public BroadcastReceiver btActionReceiver = new BroadcastReceiver() {
         //CAUTION: This method will run on main thread of process.
         @Override
         public void onReceive(Context context, Intent intent) {

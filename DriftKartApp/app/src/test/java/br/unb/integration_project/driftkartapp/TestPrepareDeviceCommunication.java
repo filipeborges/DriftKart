@@ -1,7 +1,10 @@
 package br.unb.integration_project.driftkartapp;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Looper;
@@ -38,6 +41,68 @@ public class TestPrepareDeviceCommunication {
         PowerMockito.mockStatic(Looper.class);
         deviceComm = new PrepareDeviceCommunication(mockActivity);
         btConnectionMock = Mockito.mock(BluetoothConnection.class);
+    }
+
+    @Test
+    public void testBroadcastReceiver() {
+        Context contextMock = Mockito.mock(Context.class);
+        Intent intentMock = Mockito.mock(Intent.class);
+        deviceComm.setAttributesForUnitTest(btConnectionMock, null, null);
+
+        //Discovery started.
+        Mockito.when(intentMock.getAction()).thenReturn(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        deviceComm.btActionReceiver.onReceive(contextMock, intentMock);
+        Mockito.verify(mockActivity, Mockito.times(1)).showSearchDialog();
+
+        //Discovery finished and btDevice is null.
+        Mockito.when(intentMock.getAction()).thenReturn(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        deviceComm.btActionReceiver.onReceive(contextMock, intentMock);
+        Mockito.verify(btConnectionMock, Mockito.times(1)).cancelDeviceDiscovery();
+        Mockito.verify(mockActivity, Mockito.times(1)).dismissSearchDialog();
+        Mockito.verify(mockActivity, Mockito.times(1)).showConnTryAgainDialog();
+
+        //Device founded and succeeded pairing.
+        btConnectionMock = Mockito.mock(BluetoothConnection.class);
+        mockActivity = Mockito.mock(MainActivity.class);
+        deviceComm = new PrepareDeviceCommunication(mockActivity);
+        deviceComm.setAttributesForUnitTest(btConnectionMock, null, null);
+        Mockito.when(intentMock.getAction()).thenReturn(BluetoothDevice.ACTION_FOUND);
+        BluetoothDevice btDeviceMock = PowerMockito.mock(BluetoothDevice.class);
+        String macAdress = "20:15:02:03:53:66";
+        Mockito.when(intentMock.getAction()).thenReturn(BluetoothDevice.ACTION_FOUND);
+        Mockito.when(intentMock.getParcelableExtra(Mockito.anyString())).thenReturn(btDeviceMock);
+        Mockito.when(btDeviceMock.getAddress()).thenReturn(macAdress);
+        Mockito.when(btConnectionMock.pairWithFoundedDevice(Mockito.any(BluetoothDevice.class)))
+                .thenReturn(BluetoothConnection.PREVIOUSLY_PAIRED);
+        Mockito.when(btConnectionMock.openSerialConnToDevice(Mockito.any(BluetoothDevice.class),
+                Mockito.any(Handler.class), Mockito.any(Runnable.class), Mockito.any(Runnable.class)))
+                .thenReturn(BluetoothConnection.SERIAL_CONN_OPENED);
+        deviceComm.btActionReceiver.onReceive(contextMock, intentMock);
+        Mockito.verify(btConnectionMock, Mockito.times(1)).cancelDeviceDiscovery();
+        Mockito.verify(btConnectionMock, Mockito.times(1))
+                .pairWithFoundedDevice(Mockito.any(BluetoothDevice.class));
+        Mockito.verify(btConnectionMock, Mockito.times(1))
+                .openSerialConnToDevice(Mockito.any(BluetoothDevice.class),
+                        Mockito.any(Handler.class), Mockito.any(Runnable.class), Mockito.any(Runnable.class));
+        Mockito.verify(mockActivity, Mockito.times(0)).showLongToastDialog(Mockito.anyString());
+
+        //Device founded and failed pairing. Depends on before test.
+        Mockito.when(btConnectionMock.openSerialConnToDevice(Mockito.any(BluetoothDevice.class),
+                Mockito.any(Handler.class), Mockito.any(Runnable.class), Mockito.any(Runnable.class)))
+                .thenReturn(-90);
+        deviceComm.btActionReceiver.onReceive(contextMock, intentMock);
+        Mockito.verify(mockActivity, Mockito.times(1)).showLongToastDialog(Mockito.anyString());
+
+        //Discovery finished and btDevice not null.
+        btConnectionMock = Mockito.mock(BluetoothConnection.class);
+        mockActivity = Mockito.mock(MainActivity.class);
+        Mockito.when(intentMock.getAction()).thenReturn(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        deviceComm.btActionReceiver.onReceive(contextMock, intentMock);
+        Mockito.verify(btConnectionMock, Mockito.times(0)).cancelDeviceDiscovery();
+        Mockito.verify(mockActivity, Mockito.times(0)).dismissSearchDialog();
+        Mockito.verify(mockActivity, Mockito.times(0)).showConnTryAgainDialog();
+
+
     }
 
     @Test
