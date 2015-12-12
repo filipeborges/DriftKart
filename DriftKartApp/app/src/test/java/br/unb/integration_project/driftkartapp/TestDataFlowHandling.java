@@ -1,20 +1,12 @@
 package br.unb.integration_project.driftkartapp;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.UUID;
 
 @RunWith(PowerMockRunner.class)
 public class TestDataFlowHandling {

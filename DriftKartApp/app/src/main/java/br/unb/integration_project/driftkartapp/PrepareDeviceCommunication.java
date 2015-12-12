@@ -143,8 +143,10 @@ public class PrepareDeviceCommunication {
 
     //Created for unit test purposes.
     public void setAttributesForUnitTest(BluetoothConnection btConnectionMock,
-                                         DataFlowHandling dataFlowHandlingMock) {
+                                         DataFlowHandling dataFlowHandlingMock,
+                                         IntentFilter filterActionMock) {
         btConnection = btConnectionMock;
         dataFlowHandling = dataFlowHandlingMock;
+        filterAction = filterActionMock;
     }
 }
