@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DriftKartApp</string>
+    <string name="app_name">Drift Kart</string>
     <string name="speedometer_unit">km/h</string>
     <string name="economic_label">Ecônomico</string>
     <string name="performance_label">Desempenho</string>
