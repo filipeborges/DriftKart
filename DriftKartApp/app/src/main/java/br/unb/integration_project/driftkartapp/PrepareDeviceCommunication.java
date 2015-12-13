@@ -21,7 +21,7 @@ public class PrepareDeviceCommunication {
     private DataFlowHandling dataFlowHandling;
     private Handler uiHandler;
     private IntentFilter filterAction;
-    private final String KART_MAC_ADDRESS = "20:15:02:03:53:66";
+    private final String KART_MAC_ADDRESS = "20:13:06:19:17:81";
     public BroadcastReceiver btActionReceiver = new BroadcastReceiver() {
         //CAUTION: This method will run on main thread of process.
         @Override
